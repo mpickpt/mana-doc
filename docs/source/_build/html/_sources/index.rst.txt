@@ -272,8 +272,7 @@ Citations
 
 ---------------------------
 Running MANA on Discovery
---------------------------
-
+---------------------------
 Check out the :doc:`discovery` page for more details.
 
 -----------
