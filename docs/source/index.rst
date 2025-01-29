@@ -269,6 +269,13 @@ Citations
 .. [optimization] \-  "Enabling Practical Transparent Checkpointing for MPI: A Topological Sort Approach."
    Xu, Yao, and Gene Cooperman. 2024 IEEE International Confrence on Cluster Computing (CLUSTER). IEEE, 2024.
 
+
+---------------------------
+Running MANA on Discovery
+--------------------------
+
+Check out the :doc:`discovery` page for more details.
+
 -----------
 Search page
 -----------
