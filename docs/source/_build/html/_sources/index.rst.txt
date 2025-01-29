@@ -44,7 +44,7 @@ This quick start assumes that you do not need to invoke SLURM, for example
 on a private PC.  A few HPC sites may also allow you to run using ``mpirun``
 on the login node.  But most HPC sites will require you to login to
 a compute node, and then use Slurm commands.
-See the section `Running MANA with SLURM`_.
+For more information, see the section `Running MANA with SLURM`_.
 
 
 To launch an MPI program with MANA:
@@ -216,10 +216,23 @@ Options for ``mana_restart.py``:
 -----------------------
 Running MANA with SLURM
 -----------------------
-SLURM is the most common job scheduler on clusters. Some systems may ask
-users to use ``srun`` to replace ``mpirun`` when running MPI applications
-with multiple processes. In this case, you can launch and restart an
-MPI program with MANA using the following commands:
+SLURM is the most common job scheduler on HPC clusters.  Generally,
+you will login to a ``login node``.  Sites may recommend either to
+compile on the login node (and possibly test on the local node using
+``mpirun``), or else to first use SLURM commands to allocate a compute node.
+In general, you will need to allocate a compute node before running
+multi-node MPI jobs.
+
+For debugging, when the job is running, many HPC sites allow
+you to interactively login to one of the compute nodes running your job,
+where you can do things like attaching with ``gdb``.  At some sites,
+you may first need to configure your ssh keys to allow for using ``ssh``
+between nodes on the HPC site without a password.
+
+Next, we assume that your system asks you to use ``srun`` to replace
+``mpirun`` when running MPI applications with multiple processes. In
+this case, you can launch and restart an MPI program with MANA using
+the following commands:
 
 .. code:: shell
 
@@ -234,7 +247,7 @@ user's home directory. Old rc files will be automatically deleted when
 using MANA. Users can also manually remove these files after the job
 is finished.
 
-When running on multiple nodes, each MPI processes will automatically find
+When running on multiple nodes, each MPI process will automatically find
 the correct hostname and port number of MANA's coordinator using the rc
 file. Alternatively, users can manually set the coordinator's hostname
 and port number using the ``-h`` and ``-p`` options when launching or
