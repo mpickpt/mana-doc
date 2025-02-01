@@ -10,33 +10,6 @@ request resources, and test MANA on the Discovery cluster.
    :local:
    :depth: 2
 
------------------------
-Cloning MANA using SSH
------------------------
-
-To clone MANA on Discovery, follow these steps:
-
-.. code:: shell
-
-   # Check if you have an existing SSH key:
-   ls ~/.ssh
-
-   # If no key exists, create one:
-   ssh-keygen -o -t rsa -C "ssh@github.com"
-
-   # Copy the public key and update it on GitHub under:
-   # `Settings > SSH and GPG keys > New SSH key`
-   cat ~/.ssh/<key_name>.pub
-
-   # Add the SSH key to your SSH agent:
-   eval "$(ssh-agent -s)"
-   ssh-add ~/.ssh/<key_name>
-
-   # Clone the project:
-   git clone git@github.com:<package_name>/<project>.git
-
-.. note:: If everything clones without you needing to input credentials, it worked successfully!
-
 ----------------------------
 Compiling MANA on Discovery
 ----------------------------
@@ -66,8 +39,6 @@ Steps to compile MANA:
 
    # Compile the project:
    make -j8
-
-.. warning:: Compiling on the login node will result in administrative warnings.
 
 -------------------------------------
 Requesting Resources for Computation
@@ -166,21 +137,12 @@ Steps for testing MANA on the Discovery cluster:
    # 6. Restart from the checkpointed state:
    /path/to/mana/bin/mana_restart.py --restartdir ckpt_images
 
----------------------------
-Known Issues and Debugging
----------------------------
-
-.. warning::
-
-   - **Current Bug**: Running OSU-MICRO-BENCHMARK under MANA on Discovery results in a segmentation fault.
-   - **Status**: Investigating potential memory corruption in registers while invoking `ld.so` with MPI processes.
-
 ----------------------------------
 Additional Benchmarks and Remarks
 ----------------------------------
 
 .. note::
 
-   Add additional benchmarks and observations for running MANA on Discovery as needed.
+   Additional benchmarks and observations for running MANA on Discovery are coming soon....
 
 Back to :ref:`Home <index>`.
