@@ -1,4 +1,4 @@
-MANA on Discovery
+MANA on CentOS 7 (Discovery at Northeastern U.)
 ==================================================
 
 ------------------
@@ -254,3 +254,13 @@ Steps for testing MANA on the Discovery cluster:
   
     /path/to/mana/bin/mana_restart.py --restartdir ckpt_images
 
+--------------------------------------
+Note: three ways to create checkpoints
+--------------------------------------
+There are three ways to create a checkpoint. 
+
+1. Using ``mana_command -c`` as above.
+
+2. Periodical checkpointing with ``-i 60`` (60 seconds). This option can be used with either ``mana_coordinator``, ``mana_launch``, or ``mana_restart``. 
+
+3. In advanced usage, there's a way to request a checkpoint under program control.

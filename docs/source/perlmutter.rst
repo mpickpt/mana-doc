@@ -1,16 +1,14 @@
-MANA on Discovery
+MANA on Perlmutter
 ==================================================
 
 ------------------
-Discovery Cluster
+Perlmutter Cluster
 -----------------
 
-Discovery is a high performance computing (HPC) resource for the Northeastern University research community.
-The Discovery cluster provides access to over 50,000 CPU cores and over 525 GPUs to all Northeastern faculty and students free of charge. 
-Compute nodes are connected with either 10 GbE or high data rate InfiniBand (200 Gbps or 100 Gbps), supporting all types and scales of computational workloads.
-Users should also visit Discovery's information `page <https://rc.northeastern.edu>`_ for more details.
+Perlmutter is a supercomputer at NERSC running SUSE Enterprise.
+Users should also visit Perlmutter's documentation `page <https://docs.nersc.gov/getting-started/>`_ for more details.
 
-This document aims to help Discovery users as well as other similar Cluster users running **CentOS-7** to utilize MANA Chekpointing and Restarting Software with MPI applications. 
+This document aims to help Perlmutter users as well as other similar Cluster users running **SUSE Enterprise** to utilize MANA Chekpointing and Restarting Software with MPI applications. 
 
 .. contents:: Contents of this page
    :backlinks: entry
@@ -32,15 +30,19 @@ There are two methods to request resources on Discovery:
     
       # Example SBATCH script:
       #!/bin/bash
-      #SBATCH -J MyJob           # Job name
-      #SBATCH -N 2               # Number of nodes
-      #SBATCH -n 16              # Number of tasks
-      #SBATCH -o output_%j.txt   # Standard output file
-      #SBATCH -e error_%j.txt    # Standard error file
-      #SBATCH --mail-user=$USER@northeastern.edu
-      #SBATCH --mail-type=ALL
-      ./my_program
+      #SBATCH -A <account>
+      #SBATCH -C cpu
+      #SBATCH --qos=debug
+      #SBATCH --time=5
+      #SBATCH --nodes=2
+      #SBATCH --ntasks-per-node=16
+
+      srun -n 32 --cpu-bind=cores -c 16 ./myapp
   
+For Slurm terminology, a `cpu` is a CPU core, a `node` is a computer
+host, and a `task` is an MPI process.  The `qos` (quality of service)
+is the type of partition nodes requested.
+
   * Submit this file as job on cluster
   
     .. code:: shell
@@ -57,83 +59,37 @@ There are two methods to request resources on Discovery:
   
     .. code:: shell
     
-      squeue -u <your_username>
-      ssh cXXX  # where 'cXXX' is the allocated node's ID
+      squeue --me  # squeue -u $USER
+      ssh XXX      # where 'XXX' is the allocated node's hostname
 
+2. **Using Interactive Job:**
 
-2. **Iteractive Allocation Tool:**
-
-  * Load the job-assist module:
-   
-    .. code:: shell
-     
-      module load job-assist
-  
-  * Run the interactive tool:
-    
-    .. code:: shell
-     
-      job-assist
-  
-     # Example menu options:
-     # SLURM Menu:
-     # 1. Default mode (srun --pty /bin/bash)
-     # 2. Interactive Mode
-     # 3. Batch Mode
-     # 4. Exit
-
-
-3. **Using SRUN:**
-
-  * **`srun`** command is useful for interacting with cluster resource manager. 
+  * **`salloc`** command is useful for allocation of interactive job.
 
     .. code:: shell
 
-      srun --partition=short --nodes=1 --ntasks=8 --cpus-per-task=1 --time=08:00:00 --mem=8GB --pty /bin/bash
+      salloc --qos interactive --nodes 1 --time 04:00:00 --constraint cpu --acount XXX
     
-    .. option:: --partition=short
+    .. option:: --nodes 1
 
-      Define type of partition required.
+      Request one node to compute on.
     
-    .. option:: --nodes=1
+    .. option:: --time=04:00:00
+    
+      Request the node for 4 hours uninterrupted.
 
-      Request one node to compute on. (Max allowed=2 for short nodes)
-    
-    .. option:: --ntasks=8
+    .. option:: --account
 
-      Number of tasks to run on requested compute resource.
+      Account name of the project this computation will be charged to.
     
-    .. option:: --cpus-per-task=1
-    
-      Inform resource manager that we will run one process per CPU-core.
-    
-    .. option:: --time=08:00:00
-    
-      Request the node for 8 hours uninterrupted.
-    
-    .. option:: --mem=8GB
-    
-      Requesting 8GB per CPU-core.
-    
-    .. option:: --pty /bin/bash
-    
-      Create an interactive shell using `/bin/bash`
-
-
 ----------------------------
-Compiling MANA on Discovery
+Compiling MANA on Perlmutter
 ----------------------------
 
-When  running on Discovery cluster, MANA compilation must be performed on a compute node. Login nodes are restricted from running compilations by admin.
+When  running on Perlmutter cluster, MANA compilation is recommended be performed on a login node.
 
 Steps to compile MANA:
 
-  * Switch to an interactive compute node using instructions above.
-  
-  * Confirm you are on a compute node (hostname should start with 'c'):
-  
-  * Now proceed with installing MANA on Discovery. For more detailed instructions, visit Home page.
-  
     .. code:: shell
     
       git clone https://github.com/mpickpt/mana
@@ -144,26 +100,24 @@ Steps to compile MANA:
       make -j$(nproc)
 
 --------------------------
-Testing MANA on Discovery
+Testing MANA on Perlmutter
 --------------------------
 
-Steps for testing MANA on the Discovery cluster:
+Steps for testing MANA on the Perlmutter cluster:
    
 1. Request a compute node interactively:
 
 2. Open two terminals connected to the same compute node. Compute node can be requested using the instructions from above sections. SSH into the compute node from a new terminal to get two terminals hooked to same compute node. Consider the following points:
     
-   * Your .ssh dir should be configured to use key-handshake with **`localhost`**. 
-    
    * You can check your hostname to connect via ssh using **`squeue --me`** to list all the compute nodes assigned to your username.
 
-   * Running **`ssh cXXXX`** will connect you compute node via a side ssh channel. (here cXXX is a placeholder for your compute-node name)
+   * Running **`ssh XXXX`** will connect you compute node via a side ssh channel.
 
 3. Launch MANA coordinator in Terminal 1:
 
   .. code:: shell
   
-    /path/to/mana/bin/mana_coordinator
+    /PATH_TO_MANA/bin/mana_coordinator
 
   MANA_Coordinator also supports these command line arguments:
 
@@ -240,17 +194,29 @@ Steps for testing MANA on the Discovery cluster:
   .. code:: shell
   
     mkdir ckpt_images
-    mpirun -n 2 /path/to/mana/bin/mana_launch.py --ckptdir ckpt_images /path/to/mana/mpi-proxy-split/test/ping_pong.exe
+    srun -n 2 /PATH_TO_MANA/bin/mana_launch.py --ckptdir ckpt_images /PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
+
+  User `mpirun` instead of `srun` if you are using the Open MPI module.
 
 5. Signal a checkpoint creation from Terminal 2:
 
   .. code:: shell
   
-    /path/to/mana/bin/mana_status -c
+    /PATH_TO_MANA/bin/mana_command -c
 
 6. Restart from the checkpointed state:
 
   .. code:: shell
   
-    /path/to/mana/bin/mana_restart.py --restartdir ckpt_images
+    /PATH_TO_MANA/bin/mana_restart.py --restartdir ckpt_images
 
+--------------------------------------
+Note: three ways to create checkpoints
+--------------------------------------
+There are three ways to create a checkpoint. 
+
+1. Using ``mana_command -c`` as above.
+
+2. Periodical checkpointing with ``-i 60`` (60 seconds). This option can be used with either ``mana_coordinator``, ``mana_launch``, or ``mana_restart``. 
+
+3. In advanced usage, there's a way to request a checkpoint under program control.
