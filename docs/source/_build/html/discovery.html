@@ -1,27 +1,26 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>MANA on Discovery &#8212; McMini 1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=712fa57f" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="MANA" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -33,6 +32,10 @@
                 &nbsp;
   <nav id="rellinks">
     <ul>
+        <li>
+          &larr;
+          <a href="index.html" title="Previous document">MANA</a>
+        </li>
     </ul>
   </nav>
               </div>
@@ -41,51 +44,29 @@
           <div class="body" role="main">
             
   <section id="mana-on-discovery">
-<h1>MANA on Discovery<a class="headerlink" href="#mana-on-discovery" title="Permalink to this heading">¶</a></h1>
-<p>MANA (MPI-Agnostic Network-Agnostic Checkpointing) is an implementation
-of transparent checkpointing for MPI. Below are instructions to clone, compile,
-request resources, and test MANA on the Discovery cluster.</p>
-<nav class="contents local" id="contents-of-this-page-backlinks-entry">
-<p class="topic-title">Contents of this page
-   :backlinks: entry</p>
+<h1>MANA on Discovery<a class="headerlink" href="#mana-on-discovery" title="Link to this heading">¶</a></h1>
+<p>Discovery is a high performance computing (HPC) resource for the Northeastern University research community.
+The Discovery cluster provides access to over 50,000 CPU cores and over 525 GPUs to all Northeastern faculty and students free of charge.
+Compute nodes are connected with either 10 GbE or high data rate InfiniBand (200 Gbps or 100 Gbps), supporting all types and scales of computational workloads.
+Users should also visit Discovery’s information <a class="reference external" href="https://rc.northeastern.edu">page</a> for more details.</p>
+<p>This document aims to help Discovery users as well as other similar Cluster users running <strong>CentOS-7</strong> to utilize MANA Chekpointing and Restarting Software with MPI applications.</p>
+<nav class="contents local" id="contents-of-this-page">
+<p class="topic-title">Contents of this page</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#compiling-mana-on-discovery" id="id1">Compiling MANA on Discovery</a></p></li>
-<li><p><a class="reference internal" href="#requesting-resources-for-computation" id="id2">Requesting Resources for Computation</a></p></li>
-<li><p><a class="reference internal" href="#testing-with-osu-micro-benchmark" id="id3">Testing with OSU-MICRO-BENCHMARK</a></p></li>
-<li><p><a class="reference internal" href="#testing-mana-on-discovery" id="id4">Testing MANA on Discovery</a></p></li>
-<li><p><a class="reference internal" href="#additional-benchmarks-and-remarks" id="id5">Additional Benchmarks and Remarks</a></p></li>
+<li><p><a class="reference internal" href="#requesting-resources-for-computation" id="id1">Requesting Resources for Computation</a></p></li>
+<li><p><a class="reference internal" href="#compiling-mana-on-discovery" id="id2">Compiling MANA on Discovery</a></p></li>
+<li><p><a class="reference internal" href="#testing-mana-on-discovery" id="id3">Testing MANA on Discovery</a></p></li>
 </ul>
 </nav>
-<section id="compiling-mana-on-discovery">
-<h2><a class="toc-backref" href="#id1" role="doc-backlink">Compiling MANA on Discovery</a><a class="headerlink" href="#compiling-mana-on-discovery" title="Permalink to this heading">¶</a></h2>
-<p>MANA compilation must be performed on a compute node. Login nodes are restricted from running compilations.</p>
-<p>Steps to compile MANA:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Switch to a compute node:</span>
-srun<span class="w"> </span>--pty<span class="w"> </span>/bin/bash
-
-<span class="c1"># Confirm you are on a compute node (hostname should start with &#39;c&#39;):</span>
-hostname
-
-<span class="c1"># Navigate to the MANA directory:</span>
-<span class="nb">cd</span><span class="w"> </span>mana
-
-<span class="c1"># Load submodules:</span>
-git<span class="w"> </span>submodule<span class="w"> </span>init
-git<span class="w"> </span>submodule<span class="w"> </span>update
-
-<span class="c1"># Configure the make files:</span>
-./configure<span class="w">             </span><span class="c1"># Normal configuration</span>
-./configure<span class="w"> </span>--enable-debug<span class="w">   </span><span class="c1"># For debug flags (-g3 -O0)</span>
-
-<span class="c1"># Compile the project:</span>
-make<span class="w"> </span>-j8
-</pre></div>
-</div>
-</section>
 <section id="requesting-resources-for-computation">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Requesting Resources for Computation</a><a class="headerlink" href="#requesting-resources-for-computation" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Requesting Resources for Computation</a><a class="headerlink" href="#requesting-resources-for-computation" title="Link to this heading">¶</a></h2>
 <p>There are two methods to request resources on Discovery:</p>
-<p>1 <strong>Using `sbatch`:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Using SBATCH:</strong></p></li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p>Start by creating a SBATCH script</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example SBATCH script:</span>
 <span class="c1">#!/bin/bash</span>
 <span class="c1">#SBATCH -J MyJob           # Job name</span>
@@ -95,26 +76,40 @@ make<span class="w"> </span>-j8
 <span class="c1">#SBATCH -e error_%j.txt    # Standard error file</span>
 <span class="c1">#SBATCH --mail-user=$USER@northeastern.edu</span>
 <span class="c1">#SBATCH --mail-type=ALL</span>
-
 ./my_program
-
-<span class="c1"># Submit the job:</span>
-sbatch<span class="w"> </span>&lt;sbatch_script&gt;
-
-<span class="c1"># Monitor the output file:</span>
-tail<span class="w"> </span>-f<span class="w"> </span>&lt;output_file&gt;
-
-<span class="c1"># To interact with allocated compute nodes:</span>
-squeue<span class="w"> </span>-u<span class="w"> </span>&lt;your_username&gt;
-ssh<span class="w"> </span>cXXX<span class="w">  </span><span class="c1"># Replace &#39;cXXX&#39; with the allocated node ID</span>
 </pre></div>
 </div>
-<p>2 <strong>Using the Interactive Allocation Tool:</strong></p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the job-assist module:</span>
-module<span class="w"> </span>load<span class="w"> </span>job-assist
-
-<span class="c1"># Run the interactive tool:</span>
-job-assist
+</li>
+<li><p>Submit this file as job on cluster</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sbatch<span class="w"> </span>&lt;sbatch_script&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Monitor the output file:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>tail<span class="w"> </span>-f<span class="w"> </span>&lt;output_file&gt;
+</pre></div>
+</div>
+</li>
+<li><p>To interact with allocated compute nodes:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>squeue<span class="w"> </span>-u<span class="w"> </span>&lt;your_username&gt;
+ssh<span class="w"> </span>cXXX<span class="w">  </span><span class="c1"># where &#39;cXXX&#39; is the allocated node&#39;s ID</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Iteractive Allocation Tool:</strong></p></li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p>Load the job-assist module:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>job-assist
+</pre></div>
+</div>
+</li>
+<li><p>Run the interactive tool:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>job-assist
 
 <span class="c1"># Example menu options:</span>
 <span class="c1"># SLURM Menu:</span>
@@ -124,56 +119,230 @@ job-assist
 <span class="c1"># 4. Exit</span>
 </pre></div>
 </div>
-</section>
-<section id="testing-with-osu-micro-benchmark">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Testing with OSU-MICRO-BENCHMARK</a><a class="headerlink" href="#testing-with-osu-micro-benchmark" title="Permalink to this heading">¶</a></h2>
-<p>Follow these steps to test with OSU-MICRO-BENCHMARK:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download and extract the benchmark:</span>
-wget<span class="w"> </span>&lt;osu_micro_benchmark_url&gt;
-tar<span class="w"> </span>-xvf<span class="w"> </span>&lt;osu_micro_benchmark.tar.gz&gt;
-
-<span class="c1"># Compile the benchmark (ensure you are on a compute node):</span>
-<span class="nb">cd</span><span class="w"> </span>&lt;osu_micro_benchmark_dir&gt;
-./configure<span class="w"> </span><span class="nv">CC</span><span class="o">=</span>mpicc<span class="w"> </span><span class="nv">CXX</span><span class="o">=</span>mpicxx
-make
-make<span class="w"> </span>install
-
-<span class="c1"># Locate and execute the benchmark file:</span>
-<span class="nb">cd</span><span class="w"> </span>mpi/pt2pt/standard
-mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span><span class="w"> </span>./osu_multi_lat
+</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><strong>Using SRUN:</strong></p></li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p><strong>`srun`</strong> command is useful for interacting with cluster resource manager.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>srun<span class="w"> </span>--partition<span class="o">=</span>short<span class="w"> </span>--nodes<span class="o">=</span><span class="m">1</span><span class="w"> </span>--ntasks<span class="o">=</span><span class="m">8</span><span class="w"> </span>--cpus-per-task<span class="o">=</span><span class="m">1</span><span class="w"> </span>--time<span class="o">=</span><span class="m">08</span>:00:00<span class="w"> </span>--mem<span class="o">=</span>8GB<span class="w"> </span>--pty<span class="w"> </span>/bin/bash
 </pre></div>
 </div>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-partition">
+<span class="sig-name descname"><span class="pre">--partition</span></span><span class="sig-prename descclassname"><span class="pre">=short</span></span><a class="headerlink" href="#cmdoption-partition" title="Link to this definition">¶</a></dt>
+<dd><p>Define type of partition required.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-nodes">
+<span class="sig-name descname"><span class="pre">--nodes</span></span><span class="sig-prename descclassname"><span class="pre">=1</span></span><a class="headerlink" href="#cmdoption-nodes" title="Link to this definition">¶</a></dt>
+<dd><p>Request one node to compute on. (Max allowed=2 for short nodes)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-ntasks">
+<span class="sig-name descname"><span class="pre">--ntasks</span></span><span class="sig-prename descclassname"><span class="pre">=8</span></span><a class="headerlink" href="#cmdoption-ntasks" title="Link to this definition">¶</a></dt>
+<dd><p>Number of tasks to run on requested compute resource.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-cpus-per-task">
+<span class="sig-name descname"><span class="pre">--cpus-per-task</span></span><span class="sig-prename descclassname"><span class="pre">=1</span></span><a class="headerlink" href="#cmdoption-cpus-per-task" title="Link to this definition">¶</a></dt>
+<dd><p>Inform resource manager that we will run one process per CPU-core.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-time">
+<span class="sig-name descname"><span class="pre">--time</span></span><span class="sig-prename descclassname"><span class="pre">=08:00:00</span></span><a class="headerlink" href="#cmdoption-time" title="Link to this definition">¶</a></dt>
+<dd><p>Request the node for 8 hours uninterrupted.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-mem">
+<span class="sig-name descname"><span class="pre">--mem</span></span><span class="sig-prename descclassname"><span class="pre">=8GB</span></span><a class="headerlink" href="#cmdoption-mem" title="Link to this definition">¶</a></dt>
+<dd><p>Requesting 8GB per CPU-core.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pty">
+<span class="sig-name descname"><span class="pre">--pty</span></span><span class="sig-prename descclassname"> <span class="pre">/bin/bash</span></span><a class="headerlink" href="#cmdoption-pty" title="Link to this definition">¶</a></dt>
+<dd><p>Create an interactive shell using <cite>/bin/bash</cite></p>
+</dd></dl>
+
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="compiling-mana-on-discovery">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Compiling MANA on Discovery</a><a class="headerlink" href="#compiling-mana-on-discovery" title="Link to this heading">¶</a></h2>
+<p>When  running on Discovery cluster, MANA compilation must be performed on a compute node. Login nodes are restricted from running compilations by admin.</p>
+<p>Steps to compile MANA:</p>
+<blockquote>
+<div><ul>
+<li><p>Switch to an interactive compute node using instructions above.</p></li>
+<li><p>Confirm you are on a compute node (hostname should start with ‘c’):</p></li>
+<li><p>Now proceed with installing MANA on Discovery. For more detailed instructions, visit Home page.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/mpickpt/mana
+<span class="nb">cd</span><span class="w"> </span>mana
+git<span class="w"> </span>submodule<span class="w"> </span>init
+git<span class="w"> </span>submodule<span class="w"> </span>update
+./configure
+make<span class="w"> </span>-j<span class="k">$(</span>nproc<span class="k">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
 </section>
 <section id="testing-mana-on-discovery">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Testing MANA on Discovery</a><a class="headerlink" href="#testing-mana-on-discovery" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Testing MANA on Discovery</a><a class="headerlink" href="#testing-mana-on-discovery" title="Link to this heading">¶</a></h2>
 <p>Steps for testing MANA on the Discovery cluster:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Request a compute node interactively:</span>
-srun<span class="w"> </span>--pty<span class="w"> </span>/bin/bash
-
-<span class="c1"># 2. Open two terminals connected to the same compute node.</span>
-
-<span class="c1"># 3. Launch MANA coordinator in Terminal 1:</span>
-/path/to/mana/bin/mana_coordinator
-
-<span class="c1"># 4. Launch the MPI process under MANA:</span>
-mkdir<span class="w"> </span>ckpt_images
-mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span><span class="w"> </span>/path/to/mana/bin/mana_launch.py<span class="w"> </span>--ckptdir<span class="w"> </span>ckpt_images<span class="w"> </span>/path/to/mana/mpi-proxy-split/test/ping_pong.mana
-
-<span class="c1"># 5. Signal a checkpoint creation from Terminal 2:</span>
-/path/to/mana/bin/mana_status<span class="w"> </span>-c
-
-<span class="c1"># 6. Restart from the checkpointed state:</span>
-/path/to/mana/bin/mana_restart.py<span class="w"> </span>--restartdir<span class="w"> </span>ckpt_images
+<ol class="arabic simple">
+<li><p>Request a compute node interactively:</p></li>
+<li><p>Open two terminals connected to the same compute node. Compute node can be requested using the instructions from above sections. SSH into the compute node from a new terminal to get two terminals hooked to same compute node. Consider the following points:</p>
+<ul class="simple">
+<li><p>Your .ssh dir should be configured to use key-handshake with <strong>`localhost`</strong>.</p></li>
+<li><p>You can check your hostname to connect via ssh using <strong>`squeue –me`</strong> to list all the compute nodes assigned to your username.</p></li>
+<li><p>Running <strong>`ssh cXXXX`</strong> will connect you compute node via a side ssh channel. (here cXXX is a placeholder for your compute-node name)</p></li>
+</ul>
+</li>
+<li><p>Launch MANA coordinator in Terminal 1:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/path/to/mana/bin/mana_coordinator
 </pre></div>
 </div>
-</section>
-<section id="additional-benchmarks-and-remarks">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Additional Benchmarks and Remarks</a><a class="headerlink" href="#additional-benchmarks-and-remarks" title="Permalink to this heading">¶</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Additional benchmarks and observations for running MANA on Discovery are coming soon….</p>
+<p>MANA_Coordinator also supports these command line arguments:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-p">
+<span id="cmdoption-coord-port"></span><span class="sig-name descname"><span class="pre">-p</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--coord-port</span></span><span class="sig-prename descclassname"> <span class="pre">PORT_NUM</span> <span class="pre">(environment</span> <span class="pre">variable</span> <span class="pre">DMTCP_COORD_PORT)</span></span><a class="headerlink" href="#cmdoption-p" title="Link to this definition">¶</a></dt>
+<dd><p>Port to listen on (default: 7779)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-port-file">
+<span class="sig-name descname"><span class="pre">--port-file</span></span><span class="sig-prename descclassname"> <span class="pre">filename</span></span><a class="headerlink" href="#cmdoption-port-file" title="Link to this definition">¶</a></dt>
+<dd><p>File to write listener port number.
+(Useful with ‘–port 0’, which is used to assign a random port)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-status-file">
+<span class="sig-name descname"><span class="pre">--status-file</span></span><span class="sig-prename descclassname"> <span class="pre">filename</span></span><a class="headerlink" href="#cmdoption-status-file" title="Link to this definition">¶</a></dt>
+<dd><p>File to write host, port, pid, etc., info.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-ckptdir">
+<span class="sig-name descname"><span class="pre">--ckptdir</span></span><span class="sig-prename descclassname"> <span class="pre">(environment</span> <span class="pre">variable</span> <span class="pre">DMTCP_CHECKPOINT_DIR):</span></span><a class="headerlink" href="#cmdoption-ckptdir" title="Link to this definition">¶</a></dt>
+<dd><p>Directory to store dmtcp_restart_script.sh (default: ./)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-tmpdir">
+<span class="sig-name descname"><span class="pre">--tmpdir</span></span><span class="sig-prename descclassname"> <span class="pre">(environment</span> <span class="pre">variable</span> <span class="pre">DMTCP_TMPDIR):</span></span><a class="headerlink" href="#cmdoption-tmpdir" title="Link to this definition">¶</a></dt>
+<dd><p>Directory to store temporary files (default: env var TMDPIR or /tmp)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-write-kv-data">
+<span class="sig-name descname"><span class="pre">--write-kv-data:</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-write-kv-data" title="Link to this definition">¶</a></dt>
+<dd><p>Writes key-value store data to a json file in the working directory</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-exit-on-last">
+<span class="sig-name descname"><span class="pre">--exit-on-last</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-exit-on-last" title="Link to this definition">¶</a></dt>
+<dd><p>Exit automatically when last client disconnects</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-kill-after-ckpt">
+<span class="sig-name descname"><span class="pre">--kill-after-ckpt</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-kill-after-ckpt" title="Link to this definition">¶</a></dt>
+<dd><p>Kill peer processes of computation after first checkpoint is created</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-timeout">
+<span class="sig-name descname"><span class="pre">--timeout</span></span><span class="sig-prename descclassname"> <span class="pre">seconds</span></span><a class="headerlink" href="#cmdoption-timeout" title="Link to this definition">¶</a></dt>
+<dd><p>Coordinator exits after &lt;seconds&gt; even if jobs are active
+(Useful during testing to prevent runaway coordinator processes)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-stale-timeout">
+<span class="sig-name descname"><span class="pre">--stale-timeout</span></span><span class="sig-prename descclassname"> <span class="pre">seconds</span></span><a class="headerlink" href="#cmdoption-stale-timeout" title="Link to this definition">¶</a></dt>
+<dd><p>Coordinator exits after &lt;seconds&gt; if no active job (default: 8 hrs)
+(Default prevents runaway coord’s; Override w/ larger timeout or -1)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-daemon">
+<span class="sig-name descname"><span class="pre">--daemon</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-daemon" title="Link to this definition">¶</a></dt>
+<dd><p>Run silently in the background after detaching from the parent process.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-i">
+<span id="cmdoption-interval"></span><span class="sig-name descname"><span class="pre">-i</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--interval</span></span><span class="sig-prename descclassname"> <span class="pre">(environment</span> <span class="pre">variable</span> <span class="pre">DMTCP_CHECKPOINT_INTERVAL):</span></span><a class="headerlink" href="#cmdoption-i" title="Link to this definition">¶</a></dt>
+<dd><p>Time in seconds between automatic checkpoints
+(default: 0, disabled)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-coord-logfile">
+<span class="sig-name descname"><span class="pre">--coord-logfile</span></span><span class="sig-prename descclassname"> <span class="pre">PATH</span> <span class="pre">(environment</span> <span class="pre">variable</span> <span class="pre">DMTCP_COORD_LOG_FILENAME</span></span><a class="headerlink" href="#cmdoption-coord-logfile" title="Link to this definition">¶</a></dt>
+<dd><p>Coordinator will dump its logs to the given file</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-q">
+<span id="cmdoption-quiet"></span><span class="sig-name descname"><span class="pre">-q</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--quiet</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-q" title="Link to this definition">¶</a></dt>
+<dd><p>Skip startup msg; Skip NOTE msgs; if given twice, also skip WARNINGs</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-help">
+<span class="sig-name descname"><span class="pre">--help:</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-help" title="Link to this definition">¶</a></dt>
+<dd><p>Print this message and exit.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-version">
+<span class="sig-name descname"><span class="pre">--version:</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-version" title="Link to this definition">¶</a></dt>
+<dd><p>Print version information and exit.</p>
+</dd></dl>
+
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>Launch the MPI process under MANA:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>ckpt_images
+mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span><span class="w"> </span>/path/to/mana/bin/mana_launch.py<span class="w"> </span>--ckptdir<span class="w"> </span>ckpt_images<span class="w"> </span>/path/to/mana/mpi-proxy-split/test/ping_pong.exe
+</pre></div>
 </div>
-<p>Back to <span class="xref std std-ref">Home</span>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>Signal a checkpoint creation from Terminal 2:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/path/to/mana/bin/mana_status<span class="w"> </span>-c
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="6">
+<li><p>Restart from the checkpointed state:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/path/to/mana/bin/mana_restart.py<span class="w"> </span>--restartdir<span class="w"> </span>ckpt_images
+</pre></div>
+</div>
+</div></blockquote>
 </section>
 </section>
 
@@ -183,23 +352,33 @@ mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span>
                 &nbsp;
   <nav id="rellinks">
     <ul>
+        <li>
+          &larr;
+          <a href="index.html" title="Previous document">MANA</a>
+        </li>
     </ul>
   </nav>
               </div>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html">MANA</a></li>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MANA on Discovery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requesting-resources-for-computation">Requesting Resources for Computation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compiling-mana-on-discovery">Compiling MANA on Discovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-mana-on-discovery">Testing MANA on Discovery</a></li>
+</ul>
+</li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">MANA</a></li>
   </ul></li>
 </ul>
 </div>
@@ -210,7 +389,7 @@ mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
@@ -218,18 +397,18 @@ mpirun<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2024, Maxwell Pirtle, Luka Jovanovic, Gene Cooperman.
+      &#169;2024, Maxwell Pirtle, Luka Jovanovic, Gene Cooperman.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.1</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="_sources/discovery.rst.txt"

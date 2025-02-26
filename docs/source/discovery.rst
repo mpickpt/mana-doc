@@ -1,44 +1,21 @@
 MANA on Discovery
 ==================================================
 
-MANA (MPI-Agnostic Network-Agnostic Checkpointing) is an implementation
-of transparent checkpointing for MPI. Below are instructions to clone, compile,
-request resources, and test MANA on the Discovery cluster.
+------------------
+Discovery Cluster
+-----------------
+
+Discovery is a high performance computing (HPC) resource for the Northeastern University research community.
+The Discovery cluster provides access to over 50,000 CPU cores and over 525 GPUs to all Northeastern faculty and students free of charge. 
+Compute nodes are connected with either 10 GbE or high data rate InfiniBand (200 Gbps or 100 Gbps), supporting all types and scales of computational workloads.
+Users should also visit Discovery's information `page <https://rc.northeastern.edu>`_ for more details.
+
+This document aims to help Discovery users as well as other similar Cluster users running **CentOS-7** to utilize MANA Chekpointing and Restarting Software with MPI applications. 
 
 .. contents:: Contents of this page
-      :backlinks: entry
+   :backlinks: entry
    :local:
    :depth: 2
-
-----------------------------
-Compiling MANA on Discovery
-----------------------------
-
-MANA compilation must be performed on a compute node. Login nodes are restricted from running compilations.
-
-Steps to compile MANA:
-
-.. code:: shell
-
-   # Switch to a compute node:
-   srun --pty /bin/bash
-
-   # Confirm you are on a compute node (hostname should start with 'c'):
-   hostname
-
-   # Navigate to the MANA directory:
-   cd mana
-
-   # Load submodules:
-   git submodule init
-   git submodule update
-
-   # Configure the make files:
-   ./configure             # Normal configuration
-   ./configure --enable-debug   # For debug flags (-g3 -O0)
-
-   # Compile the project:
-   make -j8
 
 -------------------------------------
 Requesting Resources for Computation
@@ -46,103 +23,234 @@ Requesting Resources for Computation
 
 There are two methods to request resources on Discovery:
 
-1 **Using `sbatch`:**
+1. **Using SBATCH:**
 
-.. code:: shell
+   
+  * Start by creating a SBATCH script 
+    
+    .. code:: shell
+    
+      # Example SBATCH script:
+      #!/bin/bash
+      #SBATCH -J MyJob           # Job name
+      #SBATCH -N 2               # Number of nodes
+      #SBATCH -n 16              # Number of tasks
+      #SBATCH -o output_%j.txt   # Standard output file
+      #SBATCH -e error_%j.txt    # Standard error file
+      #SBATCH --mail-user=$USER@northeastern.edu
+      #SBATCH --mail-type=ALL
+      ./my_program
+  
+  * Submit this file as job on cluster
+  
+    .. code:: shell
+     
+      sbatch <sbatch_script>
+  
+  * Monitor the output file:
+      
+    .. code:: shell
+    
+      tail -f <output_file>  
+  
+  * To interact with allocated compute nodes:
+  
+    .. code:: shell
+    
+      squeue -u <your_username>
+      ssh cXXX  # where 'cXXX' is the allocated node's ID
 
-   # Example SBATCH script:
-   #!/bin/bash
-   #SBATCH -J MyJob           # Job name
-   #SBATCH -N 2               # Number of nodes
-   #SBATCH -n 16              # Number of tasks
-   #SBATCH -o output_%j.txt   # Standard output file
-   #SBATCH -e error_%j.txt    # Standard error file
-   #SBATCH --mail-user=$USER@northeastern.edu
-   #SBATCH --mail-type=ALL
 
-   ./my_program
+2. **Iteractive Allocation Tool:**
 
-   # Submit the job:
-   sbatch <sbatch_script>
+  * Load the job-assist module:
+   
+    .. code:: shell
+     
+      module load job-assist
+  
+  * Run the interactive tool:
+    
+    .. code:: shell
+     
+      job-assist
+  
+     # Example menu options:
+     # SLURM Menu:
+     # 1. Default mode (srun --pty /bin/bash)
+     # 2. Interactive Mode
+     # 3. Batch Mode
+     # 4. Exit
 
-   # Monitor the output file:
-   tail -f <output_file>
 
-   # To interact with allocated compute nodes:
-   squeue -u <your_username>
-   ssh cXXX  # Replace 'cXXX' with the allocated node ID
+3. **Using SRUN:**
 
-2 **Using the Interactive Allocation Tool:**
+  * **`srun`** command is useful for interacting with cluster resource manager. 
 
-.. code:: shell
+    .. code:: shell
 
-   # Load the job-assist module:
-   module load job-assist
+      srun --partition=short --nodes=1 --ntasks=8 --cpus-per-task=1 --time=08:00:00 --mem=8GB --pty /bin/bash
+    
+    .. option:: --partition=short
 
-   # Run the interactive tool:
-   job-assist
+      Define type of partition required.
+    
+    .. option:: --nodes=1
 
-   # Example menu options:
-   # SLURM Menu:
-   # 1. Default mode (srun --pty /bin/bash)
-   # 2. Interactive Mode
-   # 3. Batch Mode
-   # 4. Exit
+      Request one node to compute on. (Max allowed=2 for short nodes)
+    
+    .. option:: --ntasks=8
 
----------------------------------
-Testing with OSU-MICRO-BENCHMARK
----------------------------------
+      Number of tasks to run on requested compute resource.
+    
+    .. option:: --cpus-per-task=1
+    
+      Inform resource manager that we will run one process per CPU-core.
+    
+    .. option:: --time=08:00:00
+    
+      Request the node for 8 hours uninterrupted.
+    
+    .. option:: --mem=8GB
+    
+      Requesting 8GB per CPU-core.
+    
+    .. option:: --pty /bin/bash
+    
+      Create an interactive shell using `/bin/bash`
 
-Follow these steps to test with OSU-MICRO-BENCHMARK:
 
-.. code:: shell
+----------------------------
+Compiling MANA on Discovery
+----------------------------
 
-   # Download and extract the benchmark:
-   wget <osu_micro_benchmark_url>
-   tar -xvf <osu_micro_benchmark.tar.gz>
+When  running on Discovery cluster, MANA compilation must be performed on a compute node. Login nodes are restricted from running compilations by admin.
 
-   # Compile the benchmark (ensure you are on a compute node):
-   cd <osu_micro_benchmark_dir>
-   ./configure CC=mpicc CXX=mpicxx
-   make
-   make install
+Steps to compile MANA:
 
-   # Locate and execute the benchmark file:
-   cd mpi/pt2pt/standard
-   mpirun -n 2 ./osu_multi_lat
+  * Switch to an interactive compute node using instructions above.
+  
+  * Confirm you are on a compute node (hostname should start with 'c'):
+  
+  * Now proceed with installing MANA on Discovery. For more detailed instructions, visit Home page.
+  
+    .. code:: shell
+    
+      git clone https://github.com/mpickpt/mana
+      cd mana
+      git submodule init
+      git submodule update
+      ./configure
+      make -j$(nproc)
 
 --------------------------
 Testing MANA on Discovery
 --------------------------
 
 Steps for testing MANA on the Discovery cluster:
+   
+1. Request a compute node interactively:
 
-.. code:: shell
+2. Open two terminals connected to the same compute node. Compute node can be requested using the instructions from above sections. SSH into the compute node from a new terminal to get two terminals hooked to same compute node. Consider the following points:
+    
+   * Your .ssh dir should be configured to use key-handshake with **`localhost`**. 
+    
+   * You can check your hostname to connect via ssh using **`squeue --me`** to list all the compute nodes assigned to your username.
 
-   # 1. Request a compute node interactively:
-   srun --pty /bin/bash
+   * Running **`ssh cXXXX`** will connect you compute node via a side ssh channel. (here cXXX is a placeholder for your compute-node name)
 
-   # 2. Open two terminals connected to the same compute node.
+3. Launch MANA coordinator in Terminal 1:
 
-   # 3. Launch MANA coordinator in Terminal 1:
-   /path/to/mana/bin/mana_coordinator
+  .. code:: shell
+  
+    /path/to/mana/bin/mana_coordinator
 
-   # 4. Launch the MPI process under MANA:
-   mkdir ckpt_images
-   mpirun -n 2 /path/to/mana/bin/mana_launch.py --ckptdir ckpt_images /path/to/mana/mpi-proxy-split/test/ping_pong.mana
+  MANA_Coordinator also supports these command line arguments:
 
-   # 5. Signal a checkpoint creation from Terminal 2:
-   /path/to/mana/bin/mana_status -c
+  .. option:: -p, --coord-port PORT_NUM (environment variable DMTCP_COORD_PORT)
+  
+    Port to listen on (default: 7779)
 
-   # 6. Restart from the checkpointed state:
-   /path/to/mana/bin/mana_restart.py --restartdir ckpt_images
+  .. option:: --port-file filename
 
-----------------------------------
-Additional Benchmarks and Remarks
-----------------------------------
+    File to write listener port number.
+    (Useful with '--port 0', which is used to assign a random port)
 
-.. note::
+  .. option:: --status-file filename
 
-   Additional benchmarks and observations for running MANA on Discovery are coming soon....
+      File to write host, port, pid, etc., info.
 
-Back to :ref:`Home <index>`.
+  .. option:: --ckptdir (environment variable DMTCP_CHECKPOINT_DIR):
+
+      Directory to store dmtcp_restart_script.sh (default: ./)
+
+  .. option:: --tmpdir (environment variable DMTCP_TMPDIR):
+
+      Directory to store temporary files (default: env var TMDPIR or /tmp)
+
+  .. option:: --write-kv-data:
+
+      Writes key-value store data to a json file in the working directory
+
+  .. option:: --exit-on-last
+
+      Exit automatically when last client disconnects
+
+  .. option:: --kill-after-ckpt
+
+      Kill peer processes of computation after first checkpoint is created
+
+  .. option:: --timeout seconds
+
+      Coordinator exits after <seconds> even if jobs are active
+      (Useful during testing to prevent runaway coordinator processes)
+
+  .. option:: --stale-timeout seconds
+
+      Coordinator exits after <seconds> if no active job (default: 8 hrs)
+      (Default prevents runaway coord's; Override w/ larger timeout or -1)
+
+  .. option:: --daemon
+
+      Run silently in the background after detaching from the parent process.
+
+  .. option:: -i, --interval (environment variable DMTCP_CHECKPOINT_INTERVAL):
+
+      Time in seconds between automatic checkpoints
+      (default: 0, disabled)
+
+  .. option:: --coord-logfile PATH (environment variable DMTCP_COORD_LOG_FILENAME
+
+              Coordinator will dump its logs to the given file
+
+  .. option:: -q, --quiet
+
+      Skip startup msg; Skip NOTE msgs; if given twice, also skip WARNINGs
+
+  .. option:: --help:
+
+      Print this message and exit.
+
+  .. option:: --version:
+
+      Print version information and exit.
+
+4. Launch the MPI process under MANA:
+
+  .. code:: shell
+  
+    mkdir ckpt_images
+    mpirun -n 2 /path/to/mana/bin/mana_launch.py --ckptdir ckpt_images /path/to/mana/mpi-proxy-split/test/ping_pong.exe
+
+5. Signal a checkpoint creation from Terminal 2:
+
+  .. code:: shell
+  
+    /path/to/mana/bin/mana_status -c
+
+6. Restart from the checkpointed state:
+
+  .. code:: shell
+  
+    /path/to/mana/bin/mana_restart.py --restartdir ckpt_images
+

@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. _home:
+
 MANA
 ==================================================
 
@@ -282,9 +284,8 @@ Search page
 * :ref:`search`
 
 .. toctree::
-   :hidden:
-   :maxdepth: 2
+  :hidden:
+  :maxdepth: 2
 
-   index
-
-   Home <self>
+  Home <self>
+  discovery   
