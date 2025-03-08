@@ -11,7 +11,7 @@ MANA
 MANA (MPI-Agnostic Network-Agnostic Checkpointing) is an implementation
 of transparent checkpointing for MPI. It is built as a plugin on top
 of the `DMTCP checkpointing package <https://github.com/dmtcp/dmtcp>`_.
-DMTCP stands for "Distributed MultiThreaded CheckPpointing".
+DMTCP stands for "Distributed MultiThreaded CheckPointing".
 
 .. contents:: Contents of this page
    :backlinks: entry
@@ -99,7 +99,7 @@ Options for ``mana_coordinator``:
 
 .. option:: -i <seconds>, --interval <seconds>
 
-   Automatical checkpoint interval in seconds.
+   Automatically checkpoint after every <seconds> of time.
 
 Options for ``mana_launch.py``:
 -------------------------------
@@ -122,7 +122,7 @@ Options for ``mana_launch.py``:
 
 .. option:: -i <seconds>, --interval <seconds>
 
-   Automatical checkpoint interval in seconds.
+   Automatically checkpoint after every <seconds> of time.
 
 .. option:: --ckptdir <dir>
 
@@ -134,7 +134,7 @@ Options for ``mana_launch.py``:
 
 .. option:: --with-plugin <path>
 
-   Provide additonal plugin for dmtcp.
+   Provide additional plugin for dmtcp.
 
 .. option:: --tmpdir <path>
 
@@ -177,7 +177,7 @@ Options for ``mana_restart.py``:
 
 .. option:: -i <seconds>, --interval <seconds>
 
-   Automatical checkpoint interval in seconds.
+   Automatically checkpoint after every <seconds> of time.
 
 .. option:: --ckptdir <dir>
 
@@ -193,7 +193,7 @@ Options for ``mana_restart.py``:
 
 .. option:: --with-plugin <path>
 
-   Provide additonal plugin for dmtcp.
+   Provide additional plugin for dmtcp.
 
 .. option:: --tmpdir <path>
 
@@ -283,7 +283,7 @@ Citations
    on high-performance parallel and distributed computing. 2019.
 
 .. [optimization] \-  "Enabling Practical Transparent Checkpointing for MPI: A Topological Sort Approach."
-   Xu, Yao, and Gene Cooperman. 2024 IEEE International Confrence on Cluster Computing (CLUSTER). IEEE, 2024.
+   Xu, Yao, and Gene Cooperman. 2024 IEEE International Conference on Cluster Computing (CLUSTER). IEEE, 2024.
 
 -----------
 Search page

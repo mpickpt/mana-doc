@@ -69,7 +69,7 @@ There are two methods to request resources on Discovery:
       ssh cXXX  # where 'cXXX' is the allocated node's ID
 
 
-2. **Iteractive Allocation Tool:**
+2. **Interactive Allocation Tool:**
 
   * Load the job-assist module:
    

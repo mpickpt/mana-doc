@@ -74,7 +74,7 @@ is the type of partition nodes requested.
 
     .. code:: shell
 
-      salloc --qos interactive --nodes 1 --time 04:00:00 --constraint cpu --acount XXX
+      salloc --qos interactive --nodes 1 --time 04:00:00 --constraint cpu --account XXX
     
     .. option:: --nodes 1
 
