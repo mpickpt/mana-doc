@@ -1,14 +1,20 @@
-MANA on Perlmutter
-==================================================
+MANA on SUSE Linux 13 (Perlmutter)
+==================================
 
-------------------
-Perlmutter Cluster
------------------
+--------------------------------
+Perlmutter Cluster at NERSC/LBNL
+--------------------------------
+
+Perlmutter is an HPC cluster running **SUSE Enterprise**.
+This document aims to help users running SUSE Enterprise to utilize
+MANA Chekpointing and Restarting Software with MPI applications.
+Since each site can configure Slurm differently, we use the Perlmutter
+cluster at NERSC/LBNL astern U. as our model, here.
 
 Perlmutter is a supercomputer at NERSC running SUSE Enterprise.
-Users should also visit Perlmutter's documentation `page <https://docs.nersc.gov/getting-started/>`_ for more details.
-
-This document aims to help Perlmutter users as well as other similar Cluster users running **SUSE Enterprise** to utilize MANA Chekpointing and Restarting Software with MPI applications. 
+When it was introduced, it was the #5 supercomputer on the TOP500 list
+of June, 2021.  Users should also visit Perlmutter's documentation
+`page <https://docs.nersc.gov/getting-started/>`_ for more details.
 
 .. contents:: Contents of this page
    :backlinks: entry

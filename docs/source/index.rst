@@ -260,6 +260,20 @@ Please be aware when deciding the number of process per node and CPU
 binding strategy that MANA will create an additional checkpoint thread
 in each MPI process.
 
+
+---------------------------------------------
+Running MANA on a Specific Linux/Slurm distro
+---------------------------------------------
+Check out the following for site-specific details.  Please choose the page that is most similar to your site:
+
+1.  :doc:`MANA on CentOS 7 (Discovery at Northeastern University)<discovery>`
+2.  :doc:`MANA on SUSE Enterprise Linux 13 (Perlmutter at NERSC/LBNL)<perlmutter>`
+
+If your site is not a good match for any of the above, please send us a
+note at github about what are the differences, and we will also document
+your site.  You can find the upstream source for this documentation
+at https://github.com/mpickpt/mana-doc.
+
 ----------------------
 Citations
 ----------------------
@@ -270,12 +284,6 @@ Citations
 
 .. [optimization] \-  "Enabling Practical Transparent Checkpointing for MPI: A Topological Sort Approach."
    Xu, Yao, and Gene Cooperman. 2024 IEEE International Confrence on Cluster Computing (CLUSTER). IEEE, 2024.
-
-
----------------------------
-Running MANA on Discovery
----------------------------
-Check out the :doc:`discovery` page for more details.
 
 -----------
 Search page

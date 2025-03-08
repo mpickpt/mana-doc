@@ -1,16 +1,24 @@
-MANA on CentOS 7 (Discovery at Northeastern U.)
-==================================================
+MANA on CentOS 7
+================
 
-------------------
-Discovery Cluster
------------------
+------------------------------------
+Discovery Cluster at Northeastern U.
+------------------------------------
 
-Discovery is a high performance computing (HPC) resource for the Northeastern University research community.
-The Discovery cluster provides access to over 50,000 CPU cores and over 525 GPUs to all Northeastern faculty and students free of charge. 
-Compute nodes are connected with either 10 GbE or high data rate InfiniBand (200 Gbps or 100 Gbps), supporting all types and scales of computational workloads.
-Users should also visit Discovery's information `page <https://rc.northeastern.edu>`_ for more details.
+Discovery is an HPC cluster running **CentOS 7**.  This document aims to
+help users running CentOS-7 to utilize MANA Chekpointing and Restarting
+Software with MPI applications.  Since each site can configure Slurm
+differently, we use the Discovery cluster at Northeastern U. as our
+model, here.
 
-This document aims to help Discovery users as well as other similar Cluster users running **CentOS-7** to utilize MANA Chekpointing and Restarting Software with MPI applications. 
+Discovery is a high performance computing
+(HPC) resource for the Northeastern University research community.
+The Discovery cluster provides access to over 50,000 CPU cores and
+over 525 GPUs to all Northeastern faculty and students free of charge.
+Compute nodes are connected with either 10 GbE or high data rate
+InfiniBand (200 Gbps or 100 Gbps), supporting all types and scales of
+computational workloads.  Users should also visit Discovery's information
+`page <https://rc.northeastern.edu>`_ for more details.
 
 .. contents:: Contents of this page
    :backlinks: entry
