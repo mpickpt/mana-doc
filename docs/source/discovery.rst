@@ -90,10 +90,16 @@ There are two methods to request resources on Discovery:
      # 3. Batch Mode
      # 4. Exit
 
+  * The local policy is to do most work, including large compilations
+    on a compute node, note the login node.  If you just need a shell
+    for compilation, then choose `1` (srun --pty /bin/bash) to obtain
+    a shell on a compute node.
 
 3. **Using SRUN:**
 
-  * **`srun`** command is useful for interacting with cluster resource manager. 
+  * The **`srun`** command is useful for interactively running jobs, once you
+    are on a compute node.  In this example, instead of using `job-assist`,
+    we ask for a shell on the command line.
 
     .. code:: shell
 
@@ -132,24 +138,55 @@ There are two methods to request resources on Discovery:
 Compiling MANA on Discovery
 ----------------------------
 
-When  running on Discovery cluster, MANA compilation must be performed on a compute node. Login nodes are restricted from running compilations by admin.
+When  running on the Discovery cluster, MANA compilation must be performed
+on a compute node. Login nodes are restricted from running compilations
+or other long commands by the admin.
 
 Steps to compile MANA:
 
-  * Switch to an interactive compute node using instructions above.
+  * Switch to an interactive compute node using the instructions above.
   
   * Confirm you are on a compute node (hostname should start with 'c'):
-  
-  * Now proceed with installing MANA on Discovery. For more detailed instructions, visit Home page.
+
+  * Set your modules to a reasonable default.  As of early 2025, the
+    default is gcc-4.8, python-2.7, and no MPI.  We currently are choosing:
+
+    .. MANA currently needs gcc-9.  Can we fix it to allow gcc-8?
   
     .. code:: shell
     
+      module avail gcc
+      module load gcc/9.2.0
+      module avail python
+      module load python/3.8.1
+
+    And next, choose your preferred MPI.  When in doubt, use
+    :code:`module show <modulefile>` to get more information on the
+    module.  Here, we see a user switching choices.
+
+    .. code:: shell
+
+      module avail mpi module avail openmpi module load mpich  #
+      Accept default: currently mpich/3.3.2 module switch mpich
+      mpich/4.0.1-intel2022 module switch mpich openmpi  # Accept default:
+      currently openmpi/3.1.2 module list  # Check for compatible gcc,
+      python, mpi
+
+  * Now proceed with installing MANA on Discovery. For more detailed
+    instructions, visit the `MANA Home page <https://github.com/mpickpt/mana>`_.
+
+    .. code:: shell
+
       git clone https://github.com/mpickpt/mana
       cd mana
       git submodule init
       git submodule update
       ./configure
-      make -j$(nproc)
+      make -j8
+
+    We use :code:`-j8` because we requested :code:`--ntasks=8` earlier.
+    If you are developing software and wish to see internals of MANA,
+    choose :code:`./configure --enable-debug` instead.
 
 --------------------------
 Testing MANA on Discovery
@@ -167,13 +204,13 @@ Steps for testing MANA on the Discovery cluster:
 
    * Running **`ssh cXXXX`** will connect you compute node via a side ssh channel. (here cXXX is a placeholder for your compute-node name)
 
-3. Launch MANA coordinator in Terminal 1:
+3. Launch a MANA coordinator in Terminal 1:
 
   .. code:: shell
   
     /path/to/mana/bin/mana_coordinator
 
-  MANA_Coordinator also supports these command line arguments:
+  The mana_coordinator command also supports these command line arguments:
 
   .. option:: -p, --coord-port PORT_NUM (environment variable DMTCP_COORD_PORT)
   
