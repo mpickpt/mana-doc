@@ -204,6 +204,21 @@ Steps for testing MANA on the Perlmutter cluster:
 
   User `mpirun` instead of `srun` if you are using the Open MPI module.
 
+  **NOTE:** For MPI library versions for Intel compiled with UCX library to support Infiniband, we provide the following two solutions:
+      
+  A. For Open-Source user MPI-Applciations, we have provided a custom compiler, located at ``/PATH_TO_MANA/bin/mpicc_mana``.
+
+    .. code:: shell
+    
+       mpicc_mana my_mpi_application.c 
+
+  B. For Closed-Source MPI-Applciations, we provide support of 'shadow library' that creates a lib path of dummy libraries to shadow real Intel and UCX libraries.   
+         This creates a shadow library in ``/PATH_TO_MANA/lib/tmp`` and can be used ONLY with ``mana_launch.py``.
+
+   .. option:: --use-shadowlibs
+
+     Launch MANA with support for shadow libraries.
+ 
 5. Signal a checkpoint creation from Terminal 2:
 
   .. code:: shell

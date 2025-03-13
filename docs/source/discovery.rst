@@ -208,7 +208,7 @@ Steps for testing MANA on the Discovery cluster:
 
   .. code:: shell
   
-    /path/to/mana/bin/mana_coordinator
+    /PATH_TO_MANA/bin/mana_coordinator
 
   The mana_coordinator command also supports these command line arguments:
 
@@ -285,19 +285,34 @@ Steps for testing MANA on the Discovery cluster:
   .. code:: shell
   
     mkdir ckpt_images
-    mpirun -n 2 /path/to/mana/bin/mana_launch.py --ckptdir ckpt_images /path/to/mana/mpi-proxy-split/test/ping_pong.exe
+    mpirun -n 2 /PATH_TO_MANA/bin/mana_launch.py --ckptdir ckpt_images /path/to/mana/mpi-proxy-split/test/ping_pong.exe
 
+  **NOTE:** For MPI library versions for Intel compiled with UCX library to support Infiniband, we provide the following two solutions:
+      
+  A. For Open-Source user MPI-Applciations, we have provided a custom compiler, located at ``/PATH_TO_MANA/bin/mpicc_mana``.
+
+    .. code:: shell
+    
+       mpicc_mana my_mpi_application.c 
+
+  B. For Closed-Source MPI-Applciations, we provide support of 'shadow library' that creates a lib path of dummy libraries to shadow real Intel and UCX libraries.   
+         This creates a shadow library in ``/PATH_TO_MANA/lib/tmp`` and can be used ONLY with ``mana_launch.py``.
+
+   .. option:: --use-shadowlibs
+
+     Launch MANA with support for shadow libraries.
+ 
 5. Signal a checkpoint creation from Terminal 2:
 
   .. code:: shell
   
-    /path/to/mana/bin/mana_status -c
+    /PATH_TO_MANA/bin/mana_status -c
 
 6. Restart from the checkpointed state:
 
   .. code:: shell
   
-    /path/to/mana/bin/mana_restart.py --restartdir ckpt_images
+    /PATH_TO_MANA/bin/mana_restart.py --restartdir ckpt_images
 
 --------------------------------------
 Note: three ways to create checkpoints

@@ -156,6 +156,10 @@ Options for ``mana_launch.py``:
 
    Supress MANA's output.
 
+.. option:: --use-shadowlibs
+
+   Create dummy library for shadowing original Intel and UCX libraries 
+
 Options for ``mana_restart.py``:
 --------------------------------
 
