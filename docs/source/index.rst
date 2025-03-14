@@ -53,15 +53,15 @@ To launch an MPI program with MANA:
 
 .. code:: shell
 
-   /mana_path/bin/mana_coordinator
-   [mpirun -n <num> ] /mana_path/bin/mana_launch.py [mana options] [user_program and args]
+   PATH_TO_MANA/bin/mana_coordinator
+   [mpirun -n <num> ] PATH_TO_MANA/bin/mana_launch.py [mana options] [user_program and args]
 
 To restart a previously checkpointed program:
 
 .. code:: shell
     
-   /mana_path/bin/mana_coordinator
-   [mpirun -n <num> ] /mana_path/bin/mana_restart.py [mana options]
+   PATH_TO_MANAPATH_TO_MANA/bin/mana_coordinator
+   [mpirun -n <num> ] PATH_TO_MANA/bin/mana_restart.py [mana options]
 
 ----------------------
 MANA man page
@@ -242,9 +242,9 @@ the following commands:
 
 .. code:: shell
 
-   /mana_path/bin/mana_coordinator
-   srun -n <num> /mana_path/bin/mana_launch.py [mana options] [user_program and args]
-   srun -n <num> /mana_path/bin/mana_restart.py [mana options]
+   PATH_TO_MANA/bin/mana_coordinator
+   srun -n <num> PATH_TO_MANA/bin/mana_launch.py [mana options] [user_program and args]
+   srun -n <num> PATH_TO_MANA/bin/mana_restart.py [mana options]
 
 MANA will automatically write the hostname and port number of MANA's
 coordinator to a file
