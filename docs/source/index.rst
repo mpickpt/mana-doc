@@ -39,9 +39,9 @@ DMTCP will evolve so that MANA can use the standard DMTCP.
 If you are debugging, use ``./configure --enable-debug``, but MANA
 will then be compiled with ``-g3 -O0``, which implies lower performance.
 
-----------------------
-Quick Start
-----------------------
+-----------------------------------
+Quick Start (single-host, no SLURM)
+-----------------------------------
 This quick start assumes that you do not need to invoke SLURM, for example
 on a private PC.  A few HPC sites may also allow you to run using ``mpirun``
 on the login node.  But most HPC sites will require you to login to
@@ -63,9 +63,9 @@ To restart a previously checkpointed program:
    PATH_TO_MANAPATH_TO_MANA/bin/mana_coordinator
    [mpirun -n <num> ] PATH_TO_MANA/bin/mana_restart.py [mana options]
 
-----------------------
-MANA man page
-----------------------
+-----------------------------
+MANA man page (MANA commands)
+-----------------------------
 .. program:: mana
 
 **NAME**
@@ -222,18 +222,17 @@ Options for ``mana_restart.py``:
 -----------------------
 Running MANA with SLURM
 -----------------------
-SLURM is the most common job scheduler on HPC clusters.  Generally,
-you will login to a ``login node``.  Sites may recommend either to
-compile on the login node (and possibly test on the local node using
-``mpirun``), or else to first use SLURM commands to allocate a compute node.
-In general, you will need to allocate a compute node before running
-multi-node MPI jobs.
+SLURM is the most common job scheduler used on HPC clusters.  
+This subsection describes the basics elements of using
+MANA with SLURM.   After familiarizing yourself with these
+basics, please see the section `Running MANA with SLURM: site-specific`_,
+and choose the Linux distro most like your own for site-specific details.
 
-For debugging, when the job is running, many HPC sites allow
-you to interactively login to one of the compute nodes running your job,
-where you can do things like attaching with ``gdb``.  At some sites,
-you may first need to configure your ssh keys to allow for using ``ssh``
-between nodes on the HPC site without a password.
+On a SLURM site, you will generally first ssh to a ``login node``.
+Sites may then recommend either to compile on the login node (and possibly
+test on the local login node using ``mpirun``), or else to first use SLURM
+commands to allocate a ``compute node``.  You will need to allocate one
+or more compute nodes before running multi-node MPI jobs.
 
 Next, we assume that your system asks you to use ``srun`` to replace
 ``mpirun`` when running MPI applications with multiple processes. In
@@ -260,14 +259,69 @@ and port number using the ``-h`` and ``-p`` options when launching or
 restarting an MPI program with MANA. More information about these two
 options can be found in MANA's man page.
 
-Please be aware when deciding the number of process per node and CPU
-binding strategy that MANA will create an additional checkpoint thread
+Please be aware when deciding the number of process per node and CPU cores
+per process that MANA will create an additional checkpoint thread
 in each MPI process.
 
+------------------------------------------------------
+Debugging MPI applications: with or without MANA/SLURM
+------------------------------------------------------
 
----------------------------------------------
-Running MANA on a Specific Linux/Slurm distro
----------------------------------------------
+Debugging MPI jobs represents a special challenge, whether simply
+running ``mpirun`` directly or running ``mpirun`` with MANA.
+As always, you should go through a hierarchy of validations:
+
+1.  Does your MPI application work with ``mpirun`` (without MANA)?
+2.  Does your MPI application work with MANA for a single MPI process?
+3.  Does your MPI application work with MANA for many MPI processes
+    on a single host?
+4.  Does your MPI application work with MANA for two MPI processes,
+    with each process on a different host?
+5.  Does your MPI application work with MANA for many MPI processes and
+    many hosts?
+
+At some sites,
+you may first need to configure your ssh keys to allow for using ``ssh``
+between nodes on the HPC site without a password.  At other sites,
+you may need to ssh to an intermediate "data node", from which you
+can then ssh to the desired compute node.
+
+After finding the first environment on which validation fails,
+try traditional debugging strategies.  Print statements may help.
+If running on a single host, can you use GDB to attach to a
+running MPI process?  Generally, it is not practical to launch
+an MPI application _(FIXME: But older MANA releases had a --gdb flag)__.
+Therefore, you will want to use ``gdb -p <{OD>~`` for PID being
+one of the MPI processes.  At our site, we often insert into
+the MPI application the following code, just before the problematic
+code.
+
+.. code:: C
+  int dummmy=1;
+  while (dummy);
+
+Then, you can attach with ``gdb -p <{OD>~`` and  do:
+
+.. code:: C
+  (gdb) set dummy = 0
+
+and continue to debug.  We have found that whether your are
+running with native MPI or with MANA, you may find that the
+stack (gdb `bt` or `where`) may not show symbols, even though
+you compiled the MPI application with `-g`.  In that case, the
+solution is to use a GDB utility provided by MANA:
+
+.. code:: C
+  (gdb) source PATH_TO_MANA/util/gdb-dmtcp-utils
+  (gdb) dmtcp
+
+where `PATH_TO_MANA` is the path to the root directory of the
+MANA distribution.  Then try out the extended GDB commands that
+can restore the original debug symbols, and also do much more.
+
+--------------------------------------
+Running MANA with SLURM: site-specific
+--------------------------------------
 Check out the following for site-specific details.  Please choose the page that is most similar to your site:
 
 1.  :doc:`MANA on CentOS 7 (Discovery at Northeastern University)<discovery>`
