@@ -8,7 +8,7 @@ Perlmutter Cluster at NERSC/LBNL
 Perlmutter is an HPC cluster running **SUSE Enterprise**.
 This document aims to help users running SUSE Enterprise to utilize
 MANA Chekpointing and Restarting Software with MPI applications.
-Since each site can configure Slurm differently, we use the Perlmutter
+Since each site can configure SLURM differently, we use the Perlmutter
 cluster at NERSC/LBNL astern U. as our model, here.
 
 Perlmutter is a supercomputer at NERSC running SUSE Enterprise.
@@ -29,9 +29,8 @@ There are two methods to request resources on Discovery:
 
 1. **Using SBATCH:**
 
-   
-  * Start by creating a SBATCH script 
-    
+  * Start by creating a SBATCH script
+
     .. code:: shell
     
       # Example SBATCH script:
@@ -44,25 +43,25 @@ There are two methods to request resources on Discovery:
       #SBATCH --ntasks-per-node=16
 
       srun -n 32 --cpu-bind=cores -c 16 ./myapp
-  
-For Slurm terminology, a `cpu` is a CPU core, a `node` is a computer
-host, and a `task` is an MPI process.  The `qos` (quality of service)
+
+For SLURM terminology, a _cpu_ is a CPU core, a _node_ is a computer
+host, and a _task_ is an MPI process.  The _qos_ (quality of service)
 is the type of partition nodes requested.
 
   * Submit this file as job on cluster
-  
+
     .. code:: shell
      
       sbatch <sbatch_script>
-  
+
   * Monitor the output file:
       
     .. code:: shell
     
-      tail -f <output_file>  
-  
+      tail -f <output_file>
+
   * To interact with allocated compute nodes:
-  
+
     .. code:: shell
     
       squeue --me  # squeue -u $USER
@@ -70,7 +69,7 @@ is the type of partition nodes requested.
 
 2. **Using Interactive Job:**
 
-  * **`salloc`** command is useful for allocation of interactive job.
+  * **``salloc``** command is useful for allocation of interactive job.
 
     .. code:: shell
 
@@ -87,7 +86,7 @@ is the type of partition nodes requested.
     .. option:: --account
 
       Account name of the project this computation will be charged to.
-    
+
 ----------------------------
 Compiling MANA on Perlmutter
 ----------------------------
@@ -110,22 +109,29 @@ Testing MANA on Perlmutter
 --------------------------
 
 Steps for testing MANA on the Perlmutter cluster:
-   
+
 1. Request a compute node interactively:
 
-2. Open two terminals connected to the same compute node. Compute node can be requested using the instructions from above sections. SSH into the compute node from a new terminal to get two terminals hooked to same compute node. Consider the following points:
-    
-   * You can check your hostname to connect via ssh using **`squeue --me`** to list all the compute nodes assigned to your username.
+   ***FIXME: ``salloc`` ...***
 
-   * Running **`ssh XXXX`** will connect you compute node via a side ssh channel.
+2. Open two terminals connected to the same compute node. Compute node
+   can be requested using the instructions from above sections. SSH into
+   the compute node from a new terminal to get two terminals hooked to same
+   compute node. Consider the following points:
 
-3. Launch MANA coordinator in Terminal 1:
+   * You can check your hostname to connect via ssh using
+     **``squeue --me``** to list all the compute nodes assigned to
+     your username.
+   * Running **``ssh XXXX``** will connect to your compute node via ssh.
+     (Here cXXX is a placeholder for your compute-node name.)
+
+3. Launch a MANA coordinator in Terminal 1:
 
   .. code:: shell
   
     PATH_TO_MANA/bin/mana_coordinator
 
-  MANA_Coordinator also supports these command line arguments:
+  The ``mana_coordinator`` command also supports these command line arguments:
 
   .. option:: -p, --coord-port PORT_NUM (environment variable DMTCP_COORD_PORT)
   
@@ -146,7 +152,7 @@ Steps for testing MANA on the Perlmutter cluster:
 
   .. option:: --tmpdir (environment variable DMTCP_TMPDIR):
 
-      Directory to store temporary files (default: env var TMDPIR or /tmp)
+      Directory to store temporary files (default: env var TMPDIR or /tmp)
 
   .. option:: --write-kv-data:
 
@@ -202,28 +208,41 @@ Steps for testing MANA on the Perlmutter cluster:
     mkdir ckpt_images
     srun -n 2 PATH_TO_MANA/bin/mana_launch.py --ckptdir ckpt_images PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
 
-  User `mpirun` instead of `srun` if you are using the Open MPI module.
+  Use ``mpirun`` instead of ``srun`` if you are using the Open MPI module.
 
-  **NOTE:** For MPI library versions for Intel compiled with UCX library to support Infiniband, we provide the following two solutions:
-      
-  A. For Open-Source user MPI-Applciations, we have provided a custom compiler, located at ``PATH_TO_MANA/bin/mpicc_mana``.
+  **NOTE:** Usually, you can use ``mana_launch.py`` directly with an executable
+  compiled with the local ``mpicc`` command.  For some cases (e.g., MPICH-4.x),
+  we have encountered an MPI library that depends on other libraries with constructors
+  (e.g., intel, UCX libraries).  This can interfere with the proper functionig
+  of ``mana_launch.py``.  If you enounter this,  there are two possible workarounds.
+
+  A. For both open and closed source MPI applications, we provide
+     an option to use *shadow libraries* that add to the libbrary
+     search path a directory of dummy libraries to shadow certain
+     libraries related to MPI.  The ``lower half`` of MANA uses all
+     of the standard MPI libraries.  But certain MPI libraries (e.g.,
+     Intel and UCX libraries) are inconsistent with the ``upper half``
+     of MANA because they have constructor functions that gain control
+     before MANA.  The directory of shadow libraries is contained
+     in ``PATH_TO_MANA/lib/tmp`` and can be used ONLY with
+     ``mana_launch.py``.
+
+     .. option:: --use-shadowlibs
+
+       Launch MANA with support for shadow libraries.
+
+  B. For open source MPI applications, a custom MANA compiler may be used:
+     ``PATH_TO_MANA/bin/mpicc_mana``.
 
     .. code:: shell
     
-       mpicc_mana my_mpi_application.c 
+       mpicc_mana my_mpi_application.c
 
-  B. For Closed-Source MPI-Applciations, we provide support of 'shadow library' that creates a lib path of dummy libraries to shadow real Intel and UCX libraries.   
-         This creates a shadow library in ``PATH_TO_MANA/lib/tmp`` and can be used ONLY with ``mana_launch.py``.
-
-   .. option:: --use-shadowlibs
-
-     Launch MANA with support for shadow libraries.
- 
-5. Signal a checkpoint creation from Terminal 2:
+5. Create a checkpoint using Terminal 2:
 
   .. code:: shell
   
-    PATH_TO_MANA/bin/mana_command -c
+    PATH_TO_MANA/bin/mana_status -c
 
 6. Restart from the checkpointed state:
 
@@ -234,10 +253,12 @@ Steps for testing MANA on the Perlmutter cluster:
 --------------------------------------
 Note: three ways to create checkpoints
 --------------------------------------
-There are three ways to create a checkpoint. 
+There are three ways to create a checkpoint.
 
 1. Using ``mana_command -c`` as above.
 
-2. Periodical checkpointing with ``-i 60`` (60 seconds). This option can be used with either ``mana_coordinator``, ``mana_launch``, or ``mana_restart``. 
+2. Periodic checkpointing with ``-i 60`` (60 seconds). This option
+   can be used with either ``mana_coordinator``, ``mana_launch``, or
+   ``mana_restart``.
 
 3. In advanced usage, there's a way to request a checkpoint under program control.

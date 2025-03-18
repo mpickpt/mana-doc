@@ -1,24 +1,24 @@
 MANA on CentOS 7
 ================
 
-------------------------------------
-Discovery Cluster at Northeastern U.
-------------------------------------
+--------------------------------------------
+Discovery Cluster at Northeastern University
+--------------------------------------------
 
 Discovery is an HPC cluster running **CentOS 7**.  This document aims to
 help users running CentOS-7 to utilize MANA Chekpointing and Restarting
-Software with MPI applications.  Since each site can configure Slurm
+Software with MPI applications.  Since each site can configure SLURM
 differently, we use the Discovery cluster at Northeastern U. as our
 model, here.
 
 Discovery is a high performance computing
 (HPC) resource for the Northeastern University research community.
-The Discovery cluster provides access to over 50,000 CPU cores and
+In 2024, the Discovery cluster provides access to over 50,000 CPU cores and
 over 525 GPUs to all Northeastern faculty and students free of charge.
 Compute nodes are connected with either 10 GbE or high data rate
 InfiniBand (200 Gbps or 100 Gbps), supporting all types and scales of
-computational workloads.  Users should also visit Discovery's information
-`page <https://rc.northeastern.edu>`_ for more details.
+computational workloads.  Users should also visit `Discovery's information
+page <https://rc.northeastern.edu>`_ for more details.
 
 .. contents:: Contents of this page
    :backlinks: entry
@@ -33,8 +33,7 @@ There are two methods to request resources on Discovery:
 
 1. **Using SBATCH:**
 
-   
-  * Start by creating a SBATCH script 
+  * Start by creating a SBATCH script
     
     .. code:: shell
     
@@ -48,21 +47,21 @@ There are two methods to request resources on Discovery:
       #SBATCH --mail-user=$USER@northeastern.edu
       #SBATCH --mail-type=ALL
       ./my_program
-  
+
   * Submit this file as job on cluster
   
     .. code:: shell
      
       sbatch <sbatch_script>
-  
+
   * Monitor the output file:
       
     .. code:: shell
     
       tail -f <output_file>  
-  
+
   * To interact with allocated compute nodes:
-  
+
     .. code:: shell
     
       squeue -u <your_username>
@@ -76,29 +75,29 @@ There are two methods to request resources on Discovery:
     .. code:: shell
      
       module load job-assist
-  
+
   * Run the interactive tool:
     
     .. code:: shell
      
       job-assist
   
-     # Example menu options:
-     # SLURM Menu:
-     # 1. Default mode (srun --pty /bin/bash)
-     # 2. Interactive Mode
-     # 3. Batch Mode
-     # 4. Exit
+      # Example menu options:
+      # SLURM Menu:
+      # 1. Default mode (srun --pty /bin/bash)
+      # 2. Interactive Mode
+      # 3. Batch Mode
+      # 4. Exit
 
   * The local policy is to do most work, including large compilations
     on a compute node, note the login node.  If you just need a shell
-    for compilation, then choose `1` (srun --pty /bin/bash) to obtain
+    for compilation, then choose ``1`` (``srun --pty /bin/bash``) to obtain
     a shell on a compute node.
 
-3. **Using SRUN:**
+3. **Using srun:**
 
-  * The **`srun`** command is useful for interactively running jobs, once you
-    are on a compute node.  In this example, instead of using `job-assist`,
+  * The **``srun``** command is useful for interactively running jobs, once you
+    are on a compute node.  In this example, instead of using ``job-assist``,
     we ask for a shell on the command line.
 
     .. code:: shell
@@ -131,7 +130,7 @@ There are two methods to request resources on Discovery:
     
     .. option:: --pty /bin/bash
     
-      Create an interactive shell using `/bin/bash`
+      Create an interactive shell using ``/bin/bash```
 
 
 ----------------------------
@@ -145,9 +144,7 @@ or other long commands by the admin.
 Steps to compile MANA:
 
   * Switch to an interactive compute node using the instructions above.
-  
   * Confirm you are on a compute node (hostname should start with 'c'):
-
   * Set your modules to a reasonable default.  As of early 2025, the
     default is gcc-4.8, python-2.7, and no MPI.  We currently are choosing:
 
@@ -193,16 +190,23 @@ Testing MANA on Discovery
 --------------------------
 
 Steps for testing MANA on the Discovery cluster:
-   
+
 1. Request a compute node interactively:
 
-2. Open two terminals connected to the same compute node. Compute node can be requested using the instructions from above sections. SSH into the compute node from a new terminal to get two terminals hooked to same compute node. Consider the following points:
-    
-   * Your .ssh dir should be configured to use key-handshake with **`localhost`**. 
-    
-   * You can check your hostname to connect via ssh using **`squeue --me`** to list all the compute nodes assigned to your username.
+   ***FIXME: ``salloc`` ...***
 
-   * Running **`ssh cXXXX`** will connect you compute node via a side ssh channel. (here cXXX is a placeholder for your compute-node name)
+2. Open two terminals connected to the same compute node. Compute node
+   can be requested using the instructions from above sections. SSH into
+   the compute node from a new terminal to get two terminals hooked to same
+   compute node. Consider the following points:
+
+   * Your .ssh dir should be configured to use a key-handshake with
+     **``localhost``**.
+   * You can check your hostname to connect via ssh using
+     **``squeue --me``** to list all the compute nodes assigned to
+     your username.
+   * Running **``ssh XXXX``** will connect to your compute node via ssh.
+     (Here cXXX is a placeholder for your compute-node name.)
 
 3. Launch a MANA coordinator in Terminal 1:
 
@@ -210,7 +214,7 @@ Steps for testing MANA on the Discovery cluster:
   
     PATH_TO_MANA/bin/mana_coordinator
 
-  The mana_coordinator command also supports these command line arguments:
+  The ``mana_coordinator`` command also supports these command line arguments:
 
   .. option:: -p, --coord-port PORT_NUM (environment variable DMTCP_COORD_PORT)
   
@@ -231,7 +235,7 @@ Steps for testing MANA on the Discovery cluster:
 
   .. option:: --tmpdir (environment variable DMTCP_TMPDIR):
 
-      Directory to store temporary files (default: env var TMDPIR or /tmp)
+      Directory to store temporary files (default: env var TMPDIR or /tmp)
 
   .. option:: --write-kv-data:
 
@@ -287,22 +291,35 @@ Steps for testing MANA on the Discovery cluster:
     mkdir ckpt_images
     mpirun -n 2 PATH_TO_MANA/bin/mana_launch.py --ckptdir ckpt_images PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
 
-  **NOTE:** For MPI library versions for Intel compiled with UCX library to support Infiniband, we provide the following two solutions:
-      
-  A. For Open-Source user MPI-Applciations, we have provided a custom compiler, located at ``PATH_TO_MANA/bin/mpicc_mana``.
+  **NOTE:** Usually, you can use ``mana_launch.py`` directly with an executable
+  compiled with the local ``mpicc`` command.  For some cases (e.g., MPICH-4.x),
+  we have encountered an MPI library that depends on other libraries with constructors
+  (e.g., intel, UCX libraries).  This can interfere with the proper functionig
+  of ``mana_launch.py``.  If you enounter this,  there are two possible workarounds.
+
+  A. For both open and closed source MPI applications, we provide
+     an option to use *shadow libraries* that add to the libbrary
+     search path a directory of dummy libraries to shadow certain
+     libraries related to MPI.  The ``lower half`` of MANA uses all
+     of the standard MPI libraries.  But certain MPI libraries (e.g.,
+     Intel and UCX libraries) are inconsistent with the ``upper half``
+     of MANA because they have constructor functions that gain control
+     before MANA.  The directory of shadow libraries is contained
+     in ``PATH_TO_MANA/lib/tmp`` and can be used ONLY with
+     ``mana_launch.py``.
+
+     .. option:: --use-shadowlibs
+
+       Launch MANA with support for shadow libraries.
+
+  B. For open source MPI applications, a custom MANA compiler may be used:
+     ``PATH_TO_MANA/bin/mpicc_mana``.
 
     .. code:: shell
     
-       mpicc_mana my_mpi_application.c 
+       mpicc_mana my_mpi_application.c
 
-  B. For Closed-Source MPI-Applciations, we provide support of 'shadow library' that creates a lib path of dummy libraries to shadow real Intel and UCX libraries.   
-         This creates a shadow library in ``PATH_TO_MANA/lib/tmp`` and can be used ONLY with ``mana_launch.py``.
-
-   .. option:: --use-shadowlibs
-
-     Launch MANA with support for shadow libraries.
- 
-5. Signal a checkpoint creation from Terminal 2:
+5. Create a checkpoint using Terminal 2:
 
   .. code:: shell
   
@@ -317,10 +334,12 @@ Steps for testing MANA on the Discovery cluster:
 --------------------------------------
 Note: three ways to create checkpoints
 --------------------------------------
-There are three ways to create a checkpoint. 
+There are three ways to create a checkpoint.
 
 1. Using ``mana_command -c`` as above.
 
-2. Periodical checkpointing with ``-i 60`` (60 seconds). This option can be used with either ``mana_coordinator``, ``mana_launch``, or ``mana_restart``. 
+2. Periodic checkpointing with ``-i 60`` (60 seconds). This option
+   can be used with either ``mana_coordinator``, ``mana_launch``, or
+   ``mana_restart``.
 
 3. In advanced usage, there's a way to request a checkpoint under program control.

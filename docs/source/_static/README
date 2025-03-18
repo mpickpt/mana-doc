@@ -1,0 +1,2 @@
+This directory is created to avoid a Sphinx warming:
+> WARNING: html_static_path entry '_static' does not exist
