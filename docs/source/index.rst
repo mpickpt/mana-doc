@@ -161,7 +161,7 @@ Options for ``mana_launch.py``:
 
 .. option:: --use-shadowlibs
 
-   Create dummy library for shadowing original Intel and UCX libraries 
+   Create dummy library for shadowing original Intel and UCX libraries
 
 Options for ``mana_restart.py``:
 --------------------------------
@@ -225,7 +225,7 @@ Options for ``mana_restart.py``:
 -----------------------
 Running MANA with SLURM
 -----------------------
-SLURM is the most common job scheduler used on HPC clusters.  
+SLURM is the most common job scheduler used on HPC clusters.
 This subsection describes the basics elements of using
 MANA with SLURM.   After familiarizing yourself with these
 basics, please see the section `Running MANA with SLURM: site-specific`_,
@@ -316,6 +316,7 @@ Next, we must pause the MPI job before the crash.  To do that, insert
 the following code at the beginning of the offending function.
 
 .. code:: C
+
   int dummmy=1;
   while (dummy);
 
@@ -333,6 +334,7 @@ even though we compiled the MPI application with `-g`.  In this case,
 the solution is to use a GDB utility provided by MANA:
 
 .. code:: C
+
   (gdb) source PATH_TO_MANA/util/gdb-dmtcp-utils
   (gdb) dmtcp
 
@@ -345,10 +347,29 @@ through the execution.  To break out of the infinite loop, we first set
 `dummy` to `0`.
 
 .. code:: C
+
   (gdb) set dummy = 0
 
-Finally, if you wish to step into the functions of MANA itself, then be
-sure to configure MANA using `./configure --enable-debug`.
+In particular, you may wish to begin GDB debugging immediately
+after restarting.  A good way to do this is to add a "while dummy"
+loop near the end of the code for the DMTCP_EVENT_RESTART case in
+MANA_ROOT/mpi-proxy-split/mpi_plugin.cpp. In this case, you will need to
+step into functions of MANA itself.  In this case, be sure to configure
+MANA using  
+`./configure --enable-debug`.
+
+Finally, instead of a classic "while dummy" clause, another common
+paradigm when debugging after restart is to insert:
+
+.. code:: C
+
+  fprintf(stderr, "Pausing for 30 seconds;"
+                  " use GDB attach for desired MPI processes:\n");
+  fprintf(stderr, "gdb -p %d\n", getpid());
+  sleep(30);
+
+In this way, you can choose to attach to one MPI process, while allowing
+the other processes to execute normally.
 
 ----------------------
 Citations
@@ -372,5 +393,5 @@ Search page
   :maxdepth: 2
 
   Home <self>
-  discovery   
+  discovery
   perlmutter
