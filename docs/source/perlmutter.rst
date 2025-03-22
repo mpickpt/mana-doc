@@ -1,15 +1,14 @@
-MANA on SUSE Linux 13 (Perlmutter)
-==================================
+MANA: SUSE Linux 13 (Perlmutter)
+================================
 
 --------------------------------
 Perlmutter Cluster at NERSC/LBNL
 --------------------------------
 
-Perlmutter is an HPC cluster running **SUSE Enterprise**.
-This document aims to help users running SUSE Enterprise to utilize
-MANA Chekpointing and Restarting Software with MPI applications.
-Since each site can configure SLURM differently, we use the Perlmutter
-cluster at NERSC/LBNL astern U. as our model, here.
+Perlmutter is an HPC cluster running **SUSE Enterprise**.  This document
+uses Perlmutter as the model for SUSE Enterprise, to discuss MANA
+Checkpointing and Restarting for MPI applications.  However, any given
+site may configure SLURM differently.
 
 Perlmutter is a supercomputer at NERSC running SUSE Enterprise.
 When it was introduced, it was the #5 supercomputer on the TOP500 list
@@ -120,7 +119,7 @@ Steps for testing MANA on the Perlmutter cluster:
    compute node. Consider the following points:
 
    * You can check your hostname to connect via ssh using
-     **``squeue --me``** to list all the compute nodes assigned to
+     **``squeue -\-me``** to list all the compute nodes assigned to
      your username.
    * Running **``ssh XXXX``** will connect to your compute node via ssh.
      (Here cXXX is a placeholder for your compute-node name.)
@@ -210,21 +209,20 @@ Steps for testing MANA on the Perlmutter cluster:
 
   Use ``mpirun`` instead of ``srun`` if you are using the Open MPI module.
 
-  **NOTE:** Usually, you can use ``mana_launch.py`` directly with an executable
+  **NOTE:** Usually, you use ``mana_launch.py`` directly with an executable
   compiled with the local ``mpicc`` command.  For some cases (e.g., MPICH-4.x),
-  we have encountered an MPI library that depends on other libraries with constructors
-  (e.g., intel, UCX libraries).  This can interfere with the proper functionig
-  of ``mana_launch.py``.  If you enounter this,  there are two possible workarounds.
+  we have encountered an MPI library that depends on other libraries with
+  constructors (e.g., intel, UCX libraries) that gain control before MANA.
+  This can interfere with the proper functionig of ``mana_launch.py``.
+  If you enounter this,  there are two possible workarounds.
 
   A. For both open and closed source MPI applications, we provide
-     an option to use *shadow libraries* that add to the libbrary
-     search path a directory of dummy libraries to shadow certain
-     libraries related to MPI.  The ``lower half`` of MANA uses all
-     of the standard MPI libraries.  But certain MPI libraries (e.g.,
-     Intel and UCX libraries) are inconsistent with the ``upper half``
-     of MANA because they have constructor functions that gain control
-     before MANA.  The directory of shadow libraries is contained
-     in ``PATH_TO_MANA/lib/tmp`` and can be used ONLY with
+     an option to use *shadow libraries* for the ``upper half`` of MANA,
+     only.  This adds to the library search path a directory of dummy
+     libraries to shadow certain libraries related to MPI.  The ``lower
+     half`` of MANA uses all of the standard MPI libraries.  The directory
+     of shadow libraries is contained in ``PATH_TO_MANA/lib/tmp`` and
+     can be used ONLY with
      ``mana_launch.py``.
 
      .. option:: --use-shadowlibs

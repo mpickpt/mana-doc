@@ -121,7 +121,7 @@ Options for ``mana_launch.py``:
 
 .. option:: -p <port>, --coord-port <port>
 
-   Set the port number for connecting MANA's coordinator. If not set, MANA will use the default port.
+   Set the port number for connecting MANA's coordinator. If not set, MANA will use the DMTCP default port (7779).
 
 .. option:: -i <seconds>, --interval <seconds>
 
@@ -141,15 +141,11 @@ Options for ``mana_launch.py``:
 
 .. option:: --tmpdir <path>
 
-   Set MANA's tmp directory.
+   Set MANA's tmp directory (default './tmp')
 
 .. option:: --coord-logfile <path>
 
    Set MANA's coordinator log file path.
-
-.. option:: --gdb
-
-   Launch MANA and the target executable with gdb.
 
 .. option:: --timing
 
@@ -162,6 +158,10 @@ Options for ``mana_launch.py``:
 .. option:: --use-shadowlibs
 
    Create dummy library for shadowing original Intel and UCX libraries
+
+.. option:: --gdb
+
+   EXPERTS ONLY: Restart MANA and the target executable with gdb.
 
 Options for ``mana_restart.py``:
 --------------------------------
@@ -180,7 +180,7 @@ Options for ``mana_restart.py``:
 
 .. option:: -p <port>, --coord-port <port>
 
-   Set the port number for connecting MANA's coordinator. If not set, MANA will use the default port.
+   Set the port number for connecting MANA's coordinator. If not set, MANA will use the DMTCP default port (7779).
 
 .. option:: -i <seconds>, --interval <seconds>
 
@@ -188,7 +188,7 @@ Options for ``mana_restart.py``:
 
 .. option:: --ckptdir <dir>
 
-   Directory to save checkpoint images. If not set, will use the working directory by default.
+   Directory to save checkpoint images. If not set, will use the current working directory by default.
 
 .. option:: --restartdir <dir>
 
@@ -210,10 +210,6 @@ Options for ``mana_restart.py``:
 
    Set MANA's coordinator log file path.
 
-.. option:: --gdb
-
-   Restart MANA and the target executable with gdb.
-
 .. option:: --timing
 
    Print timing information for each stages for checkpoint and restart to stderr.
@@ -221,6 +217,10 @@ Options for ``mana_restart.py``:
 .. option:: -q, --quiet
 
    Suppress MANA's output.
+
+.. option:: --gdb
+
+   EXPERTS ONLY: Restart MANA and the target executable with gdb.
 
 -----------------------
 Running MANA with SLURM
@@ -237,9 +237,10 @@ test on the local login node using ``mpirun``), or else to first use SLURM
 commands to allocate a *compute node*.  You will need to allocate one
 or more compute nodes before running multi-node MPI jobs.
 
-Next, we assume that your system asks you to use ``srun`` to replace
-``mpirun`` when running MPI applications with multiple processes. In
-this case, you can launch and restart an MPI program with MANA using
+Next, we assume that the system asks to use ``srun`` to replace
+``mpirun`` when using SLURM to rung MPI applications with multiple processes.
+(However, CentOS 7 and Rocky 8 will instead use ``mpirun -n <num> ...``.)
+Assuming 'srun', we launch and restart an MPI program with MANA using
 the following commands:
 
 .. code:: shell
@@ -249,11 +250,11 @@ the following commands:
    srun -n <num> PATH_TO_MANA/bin/mana_restart.py [mana options]
 
 MANA will automatically write the hostname and port number of MANA's
-coordinator to a file
-``.mana.rc`` or ``.mana-slurm-[job id].rc`` and place the file in
-user's home directory. Old rc files will be automatically deleted when
-using MANA. Users can also manually remove these files after the job
-is finished.
+coordinator to a file ``.mana.rc`` or ``.mana-slurm-[job id].rc`` and
+place the file in user's home directory. The command ``mana_status``
+uses this information to "talk" to the MANA/DMTCP coordinator.  Old rc
+files are automatically deleted when using MANA. If such stale files
+are found, they can also be removed after the job is finished.
 
 When running on multiple nodes, each MPI process will automatically find
 the correct hostname and port number of MANA's coordinator using the rc
@@ -317,7 +318,7 @@ the following code at the beginning of the offending function.
 
 .. code:: C
 
-  int dummmy=1;
+  volatile int dummmy=1;
   while (dummy);
 
 Now that we have paused the MPI job in an infinite loop, it remains to ssh

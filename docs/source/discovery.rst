@@ -1,24 +1,23 @@
-MANA on CentOS 7
-================
+MANA: CentOS 7/Rocky 8
+======================
 
 --------------------------------------------
 Discovery Cluster at Northeastern University
 --------------------------------------------
 
-Discovery is an HPC cluster running **CentOS 7**.  This document aims to
-help users running CentOS-7 to utilize MANA Chekpointing and Restarting
-Software with MPI applications.  Since each site can configure SLURM
-differently, we use the Discovery cluster at Northeastern U. as our
-model, here.
+Discovery is an HPC cluster running **CentOS 7**.  This document uses
+Discovery as the model for CentOS 7 and Rocky 8/9, to discuss MANA
+Checkpointing and Restarting for MPI applications.  However, any given
+site may configure SLURM differently.
 
-Discovery is a high performance computing
-(HPC) resource for the Northeastern University research community.
-In 2024, the Discovery cluster provides access to over 50,000 CPU cores and
-over 525 GPUs to all Northeastern faculty and students free of charge.
-Compute nodes are connected with either 10 GbE or high data rate
-InfiniBand (200 Gbps or 100 Gbps), supporting all types and scales of
-computational workloads.  Users should also visit `Discovery's information
-page <https://rc.northeastern.edu>`_ for more details.
+Discovery is a high performance computing (HPC) resource for the
+Northeastern University research community.  In 2024, the Discovery
+cluster provides access to over 50,000 CPU cores and over 525 GPUs to
+all Northeastern faculty and students free of charge.  Compute nodes
+are connected with either 10 GbE or high data rate InfiniBand (200
+Gbps or 100 Gbps), supporting all types and scales of computational
+workloads.  Users should also visit `Discovery's information page
+<https://rc.northeastern.edu>`_ for more details.
 
 .. contents:: Contents of this page
    :backlinks: entry
@@ -30,6 +29,7 @@ Requesting Resources for Computation
 -------------------------------------
 
 There are two methods to request resources on Discovery:
+batch and interactive.
 
 1. **Using SBATCH:**
 
@@ -89,16 +89,18 @@ There are two methods to request resources on Discovery:
       # 3. Batch Mode
       # 4. Exit
 
-  * The local policy is to do most work, including large compilations
-    on a compute node, note the login node.  If you just need a shell
-    for compilation, then choose ``1`` (``srun --pty /bin/bash``) to obtain
-    a shell on a compute node.
+  * The policy on Discovery is to run on a compute node, and not the original login node.
+    If you just need a shell for compilation, then choose ``1`` (``srun
+    --pty /bin/bash``) to obtain a shell on a compute node.
 
-3. **Using srun:**
+3. **Interactive session using srun:**
 
   * The **``srun``** command is useful for interactively running jobs, once you
     are on a compute node.  In this example, instead of using ``job-assist``,
-    we ask for a shell on the command line.
+    we ask for a shell on the command line.  Note that on Discovery, compute
+    nodes may always be shared.  Even if you ask for all of the CPU cores
+    (as specified by ``--ntasks``), if you are not currently running a job, then
+    the system may allocate another user to the same node.
 
     .. code:: shell
 
@@ -148,12 +150,11 @@ Steps to compile MANA:
   * Set your modules to a reasonable default.  As of early 2025, the
     default is gcc-4.8, python-2.7, and no MPI.  We currently are choosing:
 
-    .. MANA currently needs gcc-9.  Can we fix it to allow gcc-8?
-  
     .. code:: shell
     
+      # Check for compatible gcc, python, mpi
       module avail gcc
-      module load gcc/9.2.0
+      module load gcc/8.1.0
       module avail python
       module load python/3.8.1
 
@@ -163,11 +164,11 @@ Steps to compile MANA:
 
     .. code:: shell
 
-      module avail mpi module avail openmpi module load mpich  #
-      Accept default: currently mpich/3.3.2 module switch mpich
-      mpich/4.0.1-intel2022 module switch mpich openmpi  # Accept default:
-      currently openmpi/3.1.2 module list  # Check for compatible gcc,
-      python, mpi
+      module avail mpi
+      module avail mpich
+      module avail openmpi # Default is currently openmpi/3.1.2 
+      module load mpich # Accept default: currently mpich/3.3.2
+      module list
 
   * Now proceed with installing MANA on Discovery. For more detailed
     instructions, visit the `MANA Home page <https://github.com/mpickpt/mana>`_.
@@ -191,9 +192,11 @@ Testing MANA on Discovery
 
 Steps for testing MANA on the Discovery cluster:
 
-1. Request a compute node interactively:
+1. Request a compute node interactively.  As before, do:
 
-   ***FIXME: ``salloc`` ...***
+    .. code:: shell
+
+      srun --partition=short --nodes=1 --ntasks=8 --cpus-per-task=1 --time=08:00:00 --mem=8GB --pty /bin/bash
 
 2. Open two terminals connected to the same compute node. Compute node
    can be requested using the instructions from above sections. SSH into
@@ -203,7 +206,7 @@ Steps for testing MANA on the Discovery cluster:
    * Your .ssh dir should be configured to use a key-handshake with
      **``localhost``**.
    * You can check your hostname to connect via ssh using
-     **``squeue --me``** to list all the compute nodes assigned to
+     **``squeue -\-me``** to list all the compute nodes assigned to
      your username.
    * Running **``ssh XXXX``** will connect to your compute node via ssh.
      (Here cXXX is a placeholder for your compute-node name.)
@@ -291,21 +294,20 @@ Steps for testing MANA on the Discovery cluster:
     mkdir ckpt_images
     mpirun -n 2 PATH_TO_MANA/bin/mana_launch.py --ckptdir ckpt_images PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
 
-  **NOTE:** Usually, you can use ``mana_launch.py`` directly with an executable
+  **NOTE:** Usually, you use ``mana_launch.py`` directly with an executable
   compiled with the local ``mpicc`` command.  For some cases (e.g., MPICH-4.x),
-  we have encountered an MPI library that depends on other libraries with constructors
-  (e.g., intel, UCX libraries).  This can interfere with the proper functionig
-  of ``mana_launch.py``.  If you enounter this,  there are two possible workarounds.
+  we have encountered an MPI library that depends on other libraries with
+  constructors (e.g., intel, UCX libraries) that gain control before MANA.
+  This can interfere with the proper functionig of ``mana_launch.py``.
+  If you enounter this,  there are two possible workarounds.
 
   A. For both open and closed source MPI applications, we provide
-     an option to use *shadow libraries* that add to the libbrary
-     search path a directory of dummy libraries to shadow certain
-     libraries related to MPI.  The ``lower half`` of MANA uses all
-     of the standard MPI libraries.  But certain MPI libraries (e.g.,
-     Intel and UCX libraries) are inconsistent with the ``upper half``
-     of MANA because they have constructor functions that gain control
-     before MANA.  The directory of shadow libraries is contained
-     in ``PATH_TO_MANA/lib/tmp`` and can be used ONLY with
+     an option to use *shadow libraries* for the ``upper half`` of MANA,
+     only.  This adds to the library search path a directory of dummy
+     libraries to shadow certain libraries related to MPI.  The ``lower
+     half`` of MANA uses all of the standard MPI libraries.  The directory
+     of shadow libraries is contained in ``PATH_TO_MANA/lib/tmp`` and
+     can be used ONLY with
      ``mana_launch.py``.
 
      .. option:: --use-shadowlibs
@@ -313,7 +315,8 @@ Steps for testing MANA on the Discovery cluster:
        Launch MANA with support for shadow libraries.
 
   B. For open source MPI applications, a custom MANA compiler may be used:
-     ``PATH_TO_MANA/bin/mpicc_mana``.
+     ``PATH_TO_MANA/bin/mpicc_mana``.  (And do not use ``--use-shadowlibs``
+     in this case.)
 
     .. code:: shell
     
