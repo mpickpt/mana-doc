@@ -24,11 +24,24 @@ DMTCP stands for "Distributed MultiThreaded CheckPointing".
 ----------------------
 Installation
 ----------------------
-MANA can be installed using the following instructions:
+MANA can be installed using the following instructions.
+First, download and unpack the MANA package.  This can
+be done by:
+
+* going to `the MANA github home page <https://github.com/mpickpt/mana>`_;
+  clicking on the latest release (right column); and scrolling to the
+  bottom and downloading and unpacking the "Source code"; or else
+
+* cloning the latest development commit at github;
+
+  .. code:: shell
+  
+     git clone https://github.com/mpickpt/mana
+
+After that, MANA is ready to install:
 
 .. code:: shell
 
-   git clone https://github.com/mpickpt/mana
    cd mana
    git submodule init
    git submodule update
