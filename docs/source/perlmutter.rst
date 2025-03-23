@@ -66,9 +66,10 @@ is the type of partition nodes requested.
       squeue --me  # squeue -u $USER
       ssh XXX      # where 'XXX' is the allocated node's hostname
 
-2. **Using Interactive Job:**
+2. **Interactive session using salloc:**
 
-  * **``salloc``** command is useful for allocation of interactive job.
+  * The **salloc** command is useful for allocating interactive jobs.
+    The ``--constraint cpu`` option specifies CPU-only nodes (no GPU).
 
     .. code:: shell
 
@@ -90,7 +91,8 @@ is the type of partition nodes requested.
 Compiling MANA on Perlmutter
 ----------------------------
 
-When  running on Perlmutter cluster, MANA compilation is recommended be performed on a login node.
+When  running on the Perlmutter cluster, MANA compilation is recommended
+to be performed on a login node.
 
 Steps to compile MANA:
 
@@ -109,9 +111,9 @@ Testing MANA on Perlmutter
 
 Steps for testing MANA on the Perlmutter cluster:
 
-1. Request a compute node interactively:
+1. Request one or more compute nodes interactively using salloc:
 
-   ***FIXME: ``salloc`` ...***
+   ***FIXME: ``salloc`` ... (SEE "salloc", above.)***
 
 2. Open two terminals connected to the same compute node. Compute node
    can be requested using the instructions from above sections. SSH into
@@ -119,9 +121,9 @@ Steps for testing MANA on the Perlmutter cluster:
    compute node. Consider the following points:
 
    * You can check your hostname to connect via ssh using
-     **``squeue -\-me``** to list all the compute nodes assigned to
+     ``squeue --me`` to list all the compute nodes assigned to
      your username.
-   * Running **``ssh XXXX``** will connect to your compute node via ssh.
+   * Running ``ssh XXXX`` will connect to your compute node via ssh.
      (Here cXXX is a placeholder for your compute-node name.)
 
 3. Launch a MANA coordinator in Terminal 1:
@@ -200,7 +202,7 @@ Steps for testing MANA on the Perlmutter cluster:
 
       Print version information and exit.
 
-4. Launch the MPI process under MANA:
+4. Launch the MPI process under MANA using srun:
 
   .. code:: shell
   
@@ -216,21 +218,31 @@ Steps for testing MANA on the Perlmutter cluster:
   This can interfere with the proper functionig of ``mana_launch.py``.
   If you enounter this,  there are two possible workarounds.
 
+  **NOTE:** For background, a MANA computation uses a split process
+  architecture.  Two programs (an upper-half program contains the user MPI
+  application, but it uses stub libraries that link MPI calls to an MPI
+  library within a lower-half program.  The lower half is a standalone
+  MANA-specific MPI application.  AT checkpoint time, only the upper
+  half is saved, and at restart time, the lower-half program restores the
+  memory of the upper half, and re-binds it to the lower-half MPI library.
+  For details, see the original :ref:`MANA paper<mana_paper>`.
+
   A. For both open and closed source MPI applications, we provide
      an option to use *shadow libraries* for the ``upper half`` of MANA,
      only.  This adds to the library search path a directory of dummy
      libraries to shadow certain libraries related to MPI.  The ``lower
      half`` of MANA uses all of the standard MPI libraries.  The directory
      of shadow libraries is contained in ``PATH_TO_MANA/lib/tmp`` and
-     can be used ONLY with
+     is used ONLY with
      ``mana_launch.py``.
 
      .. option:: --use-shadowlibs
 
-       Launch MANA with support for shadow libraries.
+       Launch MANA and use the shadow libraries in the upper half.
 
   B. For open source MPI applications, a custom MANA compiler may be used:
-     ``PATH_TO_MANA/bin/mpicc_mana``.
+     ``PATH_TO_MANA/bin/mpicc_mana``.  (And do not use ``--use-shadowlibs``
+     in this case.)
 
     .. code:: shell
     

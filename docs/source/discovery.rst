@@ -95,12 +95,16 @@ batch and interactive.
 
 3. **Interactive session using srun:**
 
-  * The **``srun``** command is useful for interactively running jobs, once you
-    are on a compute node.  In this example, instead of using ``job-assist``,
-    we ask for a shell on the command line.  Note that on Discovery, compute
-    nodes may always be shared.  Even if you ask for all of the CPU cores
-    (as specified by ``--ntasks``), if you are not currently running a job, then
-    the system may allocate another user to the same node.
+  * The **srun** command is useful for interactively running jobs,
+    once you are on a compute node.  In this example, instead of using
+    ``job-assist``, we ask for a shell on the command line.  Note that
+    on Discovery, compute nodes may be shared.  Even if you ask for
+    all of the CPU cores (as specified by ``--ntasks``), if you are
+    not currently running a job, then the system still may allocate
+    another user to the same node.  Further, on Discovery, nodes may
+    use either TCP/IP (Ethernet) or InfiniBand.  Optionally, add
+    :option:`--constraint=ib` to ``srun`` to request nodes with InfiniBand.
+    (Other SLURM sites may name the ``ib`` feature to a different name.)
 
     .. code:: shell
 
@@ -112,11 +116,11 @@ batch and interactive.
     
     .. option:: --nodes=1
 
-      Request one node to compute on. (Max allowed=2 for short nodes)
+      Request one node to compute on. (Max allowed=2 for short partitions)
     
     .. option:: --ntasks=8
 
-      Number of tasks to run on requested compute resource.
+      Number of tasks (CPU cores) to run on requested compute nodes.
     
     .. option:: --cpus-per-task=1
     
@@ -129,6 +133,10 @@ batch and interactive.
     .. option:: --mem=8GB
     
       Requesting 8GB per CPU-core.
+    
+    .. option:: --constraint=ib
+    
+      Option specific to Discovery: request InfiniBand nodes
     
     .. option:: --pty /bin/bash
     
@@ -203,12 +211,12 @@ Steps for testing MANA on the Discovery cluster:
    the compute node from a new terminal to get two terminals hooked to same
    compute node. Consider the following points:
 
-   * Your .ssh dir should be configured to use a key-handshake with
-     **``localhost``**.
+   * Your .ssh directory should be configured to use a key-handshake with
+     **localhost**.
    * You can check your hostname to connect via ssh using
-     **``squeue -\-me``** to list all the compute nodes assigned to
+     ``squeue --me`` to list all the compute nodes assigned to
      your username.
-   * Running **``ssh XXXX``** will connect to your compute node via ssh.
+   * Running ``ssh XXXX`` will connect to your compute node via ssh.
      (Here cXXX is a placeholder for your compute-node name.)
 
 3. Launch a MANA coordinator in Terminal 1:
@@ -301,18 +309,27 @@ Steps for testing MANA on the Discovery cluster:
   This can interfere with the proper functionig of ``mana_launch.py``.
   If you enounter this,  there are two possible workarounds.
 
+  **NOTE:** For background, a MANA computation uses a split process
+  architecture.  Two programs (an upper-half program contains the user MPI
+  application, but it uses stub libraries that link MPI calls to an MPI
+  library within a lower-half program.  The lower half is a standalone
+  MANA-specific MPI application.  AT checkpoint time, only the upper
+  half is saved, and at restart time, the lower-half program restores the
+  memory of the upper half, and re-binds it to the lower-half MPI library.
+  For details, see the original :ref:`MANA paper<mana_paper>`.
+
   A. For both open and closed source MPI applications, we provide
      an option to use *shadow libraries* for the ``upper half`` of MANA,
      only.  This adds to the library search path a directory of dummy
      libraries to shadow certain libraries related to MPI.  The ``lower
      half`` of MANA uses all of the standard MPI libraries.  The directory
      of shadow libraries is contained in ``PATH_TO_MANA/lib/tmp`` and
-     can be used ONLY with
+     is used ONLY with
      ``mana_launch.py``.
 
      .. option:: --use-shadowlibs
 
-       Launch MANA with support for shadow libraries.
+       Launch MANA and use the shadow libraries in the upper half.
 
   B. For open source MPI applications, a custom MANA compiler may be used:
      ``PATH_TO_MANA/bin/mpicc_mana``.  (And do not use ``--use-shadowlibs``
