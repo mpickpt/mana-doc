@@ -154,7 +154,7 @@ or other long commands by the admin.
 Steps to compile MANA:
 
   * Switch to an interactive compute node using the instructions above.
-  * Confirm you are on a compute node (hostname should start with 'c'):
+  * Confirm you are on a compute node (hostname should start with either a '**c**' or '**d**'):
   * Set your modules to a reasonable default.  As of early 2025, the
     default is gcc-4.8, python-2.7, and no MPI.  We currently are choosing:
 
@@ -229,12 +229,12 @@ Steps for testing MANA on the Discovery cluster:
 
   .. option:: -p, --coord-port PORT_NUM (environment variable DMTCP_COORD_PORT)
   
-    Port to listen on (default: 7779)
+    Port to listen on (default: ``7779``)
 
   .. option:: --port-file filename
 
     File to write listener port number.
-    (Useful with '--port 0', which is used to assign a random port)
+    (Useful with ``--port 0``, which is used to assign a random port)
 
   .. option:: --status-file filename
 
@@ -267,8 +267,8 @@ Steps for testing MANA on the Discovery cluster:
 
   .. option:: --stale-timeout seconds
 
-      Coordinator exits after <seconds> if no active job (default: 8 hrs)
-      (Default prevents runaway coord's; Override w/ larger timeout or -1)
+      Coordinator exits after <seconds> if no active job (default: ``8`` hrs)
+      (Default prevents runaway coord's; Override w/ larger timeout or ``-1``)
 
   .. option:: --daemon
 
@@ -277,7 +277,7 @@ Steps for testing MANA on the Discovery cluster:
   .. option:: -i, --interval (environment variable DMTCP_CHECKPOINT_INTERVAL):
 
       Time in seconds between automatic checkpoints
-      (default: 0, disabled)
+      (default: ``0``, disabled)
 
   .. option:: --coord-logfile PATH (environment variable DMTCP_COORD_LOG_FILENAME
 
@@ -300,20 +300,20 @@ Steps for testing MANA on the Discovery cluster:
   .. code:: shell
   
     mkdir ckpt_images
-    mpirun -n 2 PATH_TO_MANA/bin/mana_launch.py --ckptdir ckpt_images PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
+    mpirun -n 2 PATH_TO_MANA/bin/mana_launch --ckptdir ckpt_images PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
 
-  **NOTE:** Usually, you use ``mana_launch.py`` directly with an executable
+  **NOTE:** Usually, you use ``mana_launch`` directly with an executable
   compiled with the local ``mpicc`` command.  For some cases (e.g., MPICH-4.x),
   we have encountered an MPI library that depends on other libraries with
   constructors (e.g., intel, UCX libraries) that gain control before MANA.
-  This can interfere with the proper functionig of ``mana_launch.py``.
+  This can interfere with the proper functionig of ``mana_launch``.
   If you enounter this,  there are two possible workarounds.
 
   **NOTE:** For background, a MANA computation uses a split process
   architecture.  Two programs (an upper-half program contains the user MPI
   application, but it uses stub libraries that link MPI calls to an MPI
   library within a lower-half program.  The lower half is a standalone
-  MANA-specific MPI application.  AT checkpoint time, only the upper
+  MANA-specific MPI application.  At checkpoint time, only the upper
   half is saved, and at restart time, the lower-half program restores the
   memory of the upper half, and re-binds it to the lower-half MPI library.
   For details, see the original :ref:`MANA paper<mana_paper>`.
@@ -325,7 +325,7 @@ Steps for testing MANA on the Discovery cluster:
      half`` of MANA uses all of the standard MPI libraries.  The directory
      of shadow libraries is contained in ``PATH_TO_MANA/lib/tmp`` and
      is used ONLY with
-     ``mana_launch.py``.
+     ``mana_launch``.
 
      .. option:: --use-shadowlibs
 
@@ -349,7 +349,7 @@ Steps for testing MANA on the Discovery cluster:
 
   .. code:: shell
   
-    PATH_TO_MANA/bin/mana_restart.py --restartdir ckpt_images
+    PATH_TO_MANA/bin/mana_restart --restartdir ckpt_images
 
 --------------------------------------
 Note: three ways to create checkpoints

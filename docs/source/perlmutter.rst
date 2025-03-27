@@ -207,15 +207,15 @@ Steps for testing MANA on the Perlmutter cluster:
   .. code:: shell
   
     mkdir ckpt_images
-    srun -n 2 PATH_TO_MANA/bin/mana_launch.py --ckptdir ckpt_images PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
+    srun -n 2 PATH_TO_MANA/bin/mana_launch --ckptdir ckpt_images PATH_TO_MANA/mpi-proxy-split/test/ping_pong.exe
 
   Use ``mpirun`` instead of ``srun`` if you are using the Open MPI module.
 
-  **NOTE:** Usually, you use ``mana_launch.py`` directly with an executable
+  **NOTE:** Usually, you use ``mana_launch`` directly with an executable
   compiled with the local ``mpicc`` command.  For some cases (e.g., MPICH-4.x),
   we have encountered an MPI library that depends on other libraries with
   constructors (e.g., intel, UCX libraries) that gain control before MANA.
-  This can interfere with the proper functionig of ``mana_launch.py``.
+  This can interfere with the proper functionig of ``mana_launch``.
   If you enounter this,  there are two possible workarounds.
 
   **NOTE:** For background, a MANA computation uses a split process
@@ -234,7 +234,7 @@ Steps for testing MANA on the Perlmutter cluster:
      half`` of MANA uses all of the standard MPI libraries.  The directory
      of shadow libraries is contained in ``PATH_TO_MANA/lib/tmp`` and
      is used ONLY with
-     ``mana_launch.py``.
+     ``mana_launch``.
 
      .. option:: --use-shadowlibs
 
@@ -258,7 +258,7 @@ Steps for testing MANA on the Perlmutter cluster:
 
   .. code:: shell
   
-    PATH_TO_MANA/bin/mana_restart.py --restartdir ckpt_images
+    PATH_TO_MANA/bin/mana_restart --restartdir ckpt_images
 
 --------------------------------------
 Note: three ways to create checkpoints

@@ -70,14 +70,14 @@ To launch an MPI program with MANA:
 .. code:: shell
 
    PATH_TO_MANA/bin/mana_coordinator
-   [mpirun -n <num> ] PATH_TO_MANA/bin/mana_launch.py [mana options] [user_program and args]
+   [mpirun -n <num> ] PATH_TO_MANA/bin/mana_launch [mana options] [user_program and args]
 
 To restart a previously checkpointed program:
 
 .. code:: shell
     
    PATH_TO_MANAPATH_TO_MANA/bin/mana_coordinator
-   [mpirun -n <num> ] PATH_TO_MANA/bin/mana_restart.py [mana options]
+   [mpirun -n <num> ] PATH_TO_MANA/bin/mana_restart [mana options]
 
 -----------------------------
 MANA man page (MANA commands)
@@ -95,8 +95,8 @@ MANA man page (MANA commands)
 .. parsed-literal::
 
    :program:`mana_coordinator` [OPTIONS]
-   :program:`mana_launch.py` [OPTIONS] target_executable
-   :program:`mana_restart.py` [OPTIONS]
+   :program:`mana_launch` [OPTIONS] target_executable
+   :program:`mana_restart` [OPTIONS]
 
 Options for ``mana_coordinator``:
 ---------------------------------
@@ -117,7 +117,7 @@ Options for ``mana_coordinator``:
 
    Automatically checkpoint after every <seconds> of time.
 
-Options for ``mana_launch.py``:
+Options for ``mana_launch``:
 -------------------------------
 
 .. option:: --verbose
@@ -176,7 +176,7 @@ Options for ``mana_launch.py``:
 
    EXPERTS ONLY: Restart MANA and the target executable with gdb.
 
-Options for ``mana_restart.py``:
+Options for ``mana_restart``:
 --------------------------------
 
 .. option:: --verbose
@@ -259,8 +259,8 @@ the following commands:
 .. code:: shell
 
    PATH_TO_MANA/bin/mana_coordinator
-   srun -n <num> PATH_TO_MANA/bin/mana_launch.py [mana options] [user_program and args]
-   srun -n <num> PATH_TO_MANA/bin/mana_restart.py [mana options]
+   srun -n <num> PATH_TO_MANA/bin/mana_launch [mana options] [user_program and args]
+   srun -n <num> PATH_TO_MANA/bin/mana_restart [mana options]
 
 MANA will automatically write the hostname and port number of MANA's
 coordinator to a file ``.mana.rc`` or ``.mana-slurm-[job id].rc`` and
@@ -343,8 +343,8 @@ pid of the the target MPI process.
 
 Once inside GDB and attached to an MPI process, we have found that
 whether your are running with native MPI or with MANA, the stack (using
-gdb `bt` or `where`) often does not show the functions/line numbers,
-even though we compiled the MPI application with `-g`.  In this case,
+gdb ``backtrace`` or ``where``) often does not show the functions/line numbers,
+even though we compiled the MPI application with ``-g``.  In this case,
 the solution is to use a GDB utility provided by MANA:
 
 .. code:: C
@@ -352,13 +352,13 @@ the solution is to use a GDB utility provided by MANA:
   (gdb) source PATH_TO_MANA/util/gdb-dmtcp-utils
   (gdb) dmtcp
 
-where `PATH_TO_MANA` is the path to the root directory of the MANA
+where ``PATH_TO_MANA`` is the path to the root directory of the MANA
 distribution.  Then try out the extended GDB commands that can restore
 the original debug symbols, and also do much more.
 
 Next, after examining the values of any variables, it is time to step
 through the execution.  To break out of the infinite loop, we first set
-`dummy` to `0`.
+``dummy`` to ``0``.
 
 .. code:: C
 
@@ -370,7 +370,7 @@ loop near the end of the code for the DMTCP_EVENT_RESTART case in
 MANA_ROOT/mpi-proxy-split/mpi_plugin.cpp. In this case, you will need to
 step into functions of MANA itself.  In this case, be sure to configure
 MANA using  
-`./configure --enable-debug`.
+``./configure --enable-debug``.
 
 Finally, instead of a classic "while dummy" clause, another common
 paradigm when debugging after restart is to insert:
