@@ -261,6 +261,12 @@ Steps for testing MANA on the Perlmutter cluster:
     PATH_TO_MANA/bin/mana_restart --restartdir ckpt_images
 
 --------------------------------------
+Note: 
+--------------------------------------
+Checkpoint images cannot be created after ``MPI_Finalize`` is called by application. This is 
+done to avoid creating corrupt checkpoint images which cause segmentation fault at restart. 
+
+--------------------------------------
 Note: three ways to create checkpoints
 --------------------------------------
 There are three ways to create a checkpoint.

@@ -385,6 +385,12 @@ paradigm when debugging after restart is to insert:
 In this way, you can choose to attach to one MPI process, while allowing
 the other processes to execute normally.
 
+--------------------------------------
+Note: 
+--------------------------------------
+Checkpoint images cannot be created after ``MPI_Finalize`` is called by application. This is 
+done to avoid creating corrupt checkpoint images which cause segmentation fault at restart. 
+
 ----------------------
 Citations
 ----------------------
