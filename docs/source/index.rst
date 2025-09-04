@@ -48,10 +48,6 @@ After that, MANA is ready to install:
    ./configure
    make -j8
 
-Note that the :command:`git submodule` command will automatically
-pull in a special branch of DMTCP built for MANA.  In the future,
-DMTCP will evolve so that MANA can use the standard DMTCP.
-
 If you are debugging, use ``./configure --enable-debug``, but MANA
 will then be compiled with ``-g3 -O0``, which implies lower performance.
 
@@ -78,6 +74,8 @@ To restart a previously checkpointed program:
     
    PATH_TO_MANAPATH_TO_MANA/bin/mana_coordinator
    [mpirun -n <num> ] PATH_TO_MANA/bin/mana_restart [mana options]
+
+*NOTE: In MANA 1.2.0 and earlier, use* ``mana_launch.py`` *and* ``mana_restart.py`` *(not* ``mana_launch`` *or* ``mana_restart`` *).*
 
 -----------------------------
 MANA man page (MANA commands)
